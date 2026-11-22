@@ -1,0 +1,29 @@
+name: Install base tools
+on:
+  push:
+    paths: [mise.toml, .github/workflows/base-tools.yml]
+  pull_request:
+    paths: [mise.toml, .github/workflows/base-tools.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  install:
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@924e7c586e33d7d4bae9c14e26c5d22e2beb6e78
+        with:
+          version: 2026.11.12
+          cache: false
+      - name: Run the installed commands
+        shell: bash
+        run: |
+          set -euo pipefail
+          chrono-pr pr-reminders
+          chrono-instructions --version
