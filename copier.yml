@@ -1,20 +1,32 @@
 _min_copier_version: "9.4.0"
 _subdirectory: scaffold
-_skip_if_exists: [AGENTS.md]
+_preserve_symlinks: true
 _answers_file: .chrono-harness/template-answers.yml
 features:
   type: str
   multiselect: true
-  help: 这个仓库需要哪些工具？可多选，也可留空。
-  default: []
-  choices:
-    "PR 创建、查询和本地提醒": pr
-    "项目指令生成": instructions
-    "已登记的 harness 检查与 CI 判官": harness
-    "工作树管理": worktree
-    "CI 工作流生成": ci
-    "外部登记判官": registration
-    "Verus 形式化验证工具链": verus
+  help: 默认安装全部工具。按空格取消本仓不需要的工具，回车确认。
+  default: &available_tools
+    - cache
+    - ci
+    - distribution
+    - harness
+    - host-bootstrap
+    - host-release
+    - inputs
+    - instructions
+    - judge-ci
+    - judge-cost
+    - judge-filemap
+    - judge-mixed
+    - judge-projects
+    - registration
+    - judge-routes
+    - judge-workflow
+    - pr
+    - worktree
+    - verus
+  choices: *available_tools
 generate_check:
   type: bool
   default: false

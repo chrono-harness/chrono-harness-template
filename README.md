@@ -1,15 +1,21 @@
 # chrono-harness 仓库模板
 
-在新仓库或已有仓库的根目录运行一次 Copier，选择这个项目实际使用的工具。可留空，可多选。选装工具的发行版本、平台地址和 SHA-256 都写入本仓配置。
+在已有仓库的根目录运行 Copier。默认勾选全部 18 个 Chrono 命令和 Verus。用空格取消任意工具，也可以全部取消。工具从各自版本固定的发行下载，mise 按 SHA-256 校验，安装在工作树外。支持 Linux x86_64 和 macOS arm64。
 
 ```sh
-uvx --from copier==9.19.1 copier copy --vcs-ref v0.1.0-alpha.1 gh:chrono-harness/chrono-harness-template .
+uvx --from copier==9.19.1 copier copy --vcs-ref v0.1.0-alpha.2 gh:chrono-harness/chrono-harness-template .
 mise trust
 mise install
 ```
 
-选择“生成业务检查”并填写项目现有的测试命令，模板会生成 GitHub Actions 和本地入口。维护者与 AI 都能运行 `mise run harness-check`。已有 CI 可以保留其入口，只选所需工具。
+每个仓库都得到公共工作说明 `CLAUDE.md`，以及指向它的相对符号链接 `AGENTS.md`。本仓选项保存在 `.chrono-harness/template-answers.yml`，本地命令见 `.chrono-harness/USAGE.md`。开发用 `dev`，通过验收的正式版从 `main` 发布。
 
-每个宿主的选择保存于 `.chrono-harness/template-answers.yml`，使用说明在 `.chrono-harness/USAGE.md`。先提交本仓的改动，再运行 `uvx --from copier==9.19.1 copier update --vcs-ref :current: --answers-file .chrono-harness/template-answers.yml` 调整选择。取消选项会移除模板管理的对应配置。工具由 mise 安装在工作树外。升级或回退某个工具，只需调整该仓对应的发行版本、地址及校验值。
+选择生成业务检查时，填写项目现有的检查命令和运行平台。本地与 GitHub Actions 都会执行 `mise run harness-check`。已有登记式检查的项目可以沿用自己的工作流。
 
-开发分支为 `dev`。正式版使用从 `dev` 验收后晋升到 `main` 的提交。
+先提交工作树里的本地改动。要调整本仓安装的工具，运行下面的命令重新选择，然后运行 `mise install`。取消选项后，本仓的安装清单会移除对应工具。共享缓存仍可能供其他仓库使用。
+
+```sh
+uvx --from copier==9.19.1 copier update --vcs-ref :current: --answers-file .chrono-harness/template-answers.yml
+```
+
+升级公共指令和模板时，将 `:current:` 换为目标发行标签。Copier 将模板变更与本仓已提交的定制合并，重叠修改由本仓处理。审核生成的 diff 后提交。
