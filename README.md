@@ -3,14 +3,23 @@
 在已有仓库的根目录运行 Copier。默认勾选全部 18 个 Chrono 命令和 Verus。用空格取消任意工具，也可以全部取消。工具从各自版本固定的发行下载，mise 按 SHA-256 校验，安装在工作树外。选中 Verus 会一并安装其依赖的 Rust 1.95.0。支持 Linux x86_64 和 macOS arm64。
 
 ```sh
-uvx --from copier==9.19.1 copier copy --vcs-ref v0.1.0-alpha.5 gh:chrono-harness/chrono-harness-template .
+uvx --from copier==9.19.1 copier copy --vcs-ref v0.1.0-alpha.6 gh:chrono-harness/chrono-harness-template .
 mise trust
 mise run harness-setup
 ```
 
-每个仓库的 `AGENTS.md` 都是指向本仓 `CLAUDE.md` 的相对符号链接。默认的 `harness-setup` 安装工具并运行 `chrono-instructions init --host-root .`。规则及默认清单来自这个已发布的工具。选中的规则生成到 `CLAUDE.md` 的标记块内，本仓的专属说明写在块外。初始化后的登记和指南一并提交，agent 克隆单仓即可阅读。维护者可以直接在本仓 `CLAUDE.md` 的生成块外追加“本仓开发”，写明源码、测试和本地检查入口。该段由本仓维护，模板升级会合并已提交的定制。Agent 在本仓检出内即可读到两部分。
+每个仓库的 `AGENTS.md` 链接到本仓 `CLAUDE.md`。本仓只维护自己的说明。选装指令工具后，agent 在任务开始时运行 `mise exec -- chrono-instructions rules --host-root .`，读取上游当前已发布的规则。上游修改后，下次读取自动生效。
 
-本仓选项保存在 `.chrono-harness/template-answers.yml`，本地命令见 `.chrono-harness/USAGE.md`。开发用 `dev`，通过验收的正式版从 `main` 发布。
+缺省接纳所有当前和以后新增的基础规则。需要定制时在本仓创建 `.chrono-harness/rules.json`。
+
+| 需求 | 配置 |
+| --- | --- |
+| 全部接纳 | 省略文件或 `{"mode":"all"}` |
+| 屏蔽个别 ID | `{"mode":"all","exclude":["job.wait"]}` |
+| 仅接纳部分 ID | `{"mode":"only","include":["artifact.cleanup","job.wait"]}` |
+| 关闭基础规则 | `{"mode":"off"}` |
+
+查阅[上游规则及稳定 ID](https://raw.githubusercontent.com/chrono-harness/chrono-harness-instructions/published-rules/rules.json)。本地追加说明始终在 `CLAUDE.md`。启用继承需要网络和 curl；读取失败时命令报告失败。关闭继承可以离线工作。
 
 选择生成业务检查时，填写项目现有的检查命令和运行平台。本地与 GitHub Actions 都会执行 `mise run harness-check`。已有登记式检查的项目可以沿用自己的工作流。
 
@@ -20,6 +29,8 @@ mise run harness-setup
 uvx --from copier==9.19.1 copier update --vcs-ref :current: --answers-file .chrono-harness/template-answers.yml
 ```
 
-升级公共指令和模板时，将 `:current:` 换为目标发行标签。Copier 将模板变更与本仓已提交的定制合并，重叠修改由本仓处理。审核生成的 diff 后提交。
+从 alpha.5 迁移时，先核对旧生成块、catalog、manifest 和 host-context 中的本地修改。将选择迁入 `.chrono-harness/rules.json`，把本仓追加说明放回 `CLAUDE.md`。确认继承结果后删除旧生成块和已经迁移的输入。
 
-单独取消指令工具会保留已有的项目指南。所有工具和业务检查均未选中时，可以跳过 mise 步骤。已初始化的仓库再次运行 setup 会保留其 catalog、manifest 和本仓说明。
+升级模板本身时，将 `:current:` 换为目标发行标签。Copier 将模板变更与本仓已提交的定制合并，重叠修改由本仓处理。审核生成的 diff 后提交。
+
+全部工具和业务检查都取消时，可以跳过 mise 步骤。选择记录位于 `.chrono-harness/template-answers.yml`，规则取舍归宿主的 `.chrono-harness/rules.json`。
