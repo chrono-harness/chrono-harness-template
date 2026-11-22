@@ -155,6 +155,10 @@ bin_path = "."
 linux-x64 = { url = "https://github.com/verus-lang/verus/releases/download/release/0.2026.04.24.f8e1704/verus-0.2026.04.24.f8e1704-x86-linux.zip", checksum = "sha256:36b3268ed3a70d948d0d7cb59a5397c54c52e519fc4a644311dadec02d240ce9" }
 macos-arm64 = { url = "https://github.com/verus-lang/verus/releases/download/release/0.2026.04.24.f8e1704/verus-0.2026.04.24.f8e1704-arm64-macos.zip", checksum = "sha256:023e0a6e67bb9927f43a8757ebdec318b50cbfe1fec4a1c320c53d5fd71008e7" }
 
+
+
+
 [tasks.harness-setup]
 description = "Install this repository's tools and initialize its selected agent rules"
 run = ["mise install", "chrono-instructions init --host-root ."]
+
