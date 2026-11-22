@@ -29,6 +29,6 @@ jobs:
           verus --version
           chrono-pr pr-reminders
           mise run harness-setup
-          chrono-instructions rules --host-root . > /dev/null
+          grep -Fxq '<!-- chrono-instructions:begin -->' CLAUDE.md
           test ! -e .chrono-harness/instructions/catalog.json
           test "$(readlink AGENTS.md)" = CLAUDE.md

@@ -1,16 +1,16 @@
 # chrono-harness 仓库模板
 
-在已有仓库的根目录运行 Copier。默认勾选全部 18 个 Chrono 命令和 Verus。用空格取消任意工具，也可以全部取消。工具从各自版本固定的发行下载，mise 按 SHA-256 校验，安装在工作树外。选中 Verus 会一并安装其依赖的 Rust 1.95.0。选中 host-bootstrap 或 host-release 时会一并安装它查询项目登记所需的 chrono-judge-registration。支持 Linux x86_64 和 macOS arm64。
+在已有仓库的根目录运行 Copier。默认勾选全部 18 个 Chrono 命令和 Verus。用空格取消任意工具，也可以全部取消。工具从各自版本固定的发行下载，mise 按 SHA-256 校验，安装在工作树外。选中 Verus 会一并安装其依赖的 Rust 1.95.0。选中 host-bootstrap 或 host-release 时会一并安装它查询项目登记所需的 chrono-judge-registration。单选 inputs 会安装 routes 和 FILEMAP，单选 routes 会安装 FILEMAP。单选 judge-cost 会安装 FILEMAP 和 registration。支持 Linux x86_64 和 macOS arm64。
 
 ```sh
-uvx --from copier==9.19.1 copier copy --vcs-ref v0.1.0-alpha.11 gh:chrono-harness/chrono-harness-template .
+uvx --from copier==9.19.1 copier copy --vcs-ref v0.1.0-alpha.12 gh:chrono-harness/chrono-harness-template .
 mise trust
 mise run harness-setup
 ```
 
-每个仓库的 `AGENTS.md` 链接到本仓 `CLAUDE.md`。本仓只维护自己的说明。选装指令工具后，agent 在任务开始时运行 `mise exec -- chrono-instructions rules --host-root .`，读取上游当前已发布的规则。上游修改后，下次读取自动生效。
+安装时可填写本仓职责、源码位置和验证命令，模板会将它们直接写入根指南。每个仓库的 `AGENTS.md` 链接到本仓的 `CLAUDE.md`。默认生成的根文件包含首次安装、PR 与验证入口，以及 chrono-harness-instructions 发布的默认规则全文。克隆仓库即可阅读。工具的版本和校验值在本仓的 mise 清单中。
 
-缺省接纳所有当前和以后新增的基础规则。需要定制时在本仓创建 `.chrono-harness/rules.json`。
+模板安装的 `.chrono-harness/rules.json` 默认为 `{"mode":"all"}`，省略该文件同样接受全部当前和以后新增的规则。每次开始任务时，运行 `mise run harness-setup`。选装 instructions 的仓库会用本仓固定版本的 `chrono-instructions sync-rules --host-root .` 读取上游已发布的规则，按本仓选择更新根指南。成功后重新阅读指南。仓库自己的职责、源码位置和检查入口放在生成块之外。同步失败会保留原指南。
 
 | 需求 | 配置 |
 | --- | --- |

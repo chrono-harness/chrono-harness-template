@@ -1,7 +1,7 @@
 _min_copier_version: "9.4.0"
 _subdirectory: scaffold
 _preserve_symlinks: true
-_skip_if_exists: [CLAUDE.md]
+_skip_if_exists: [.chrono-harness/rules.json]
 _answers_file: .chrono-harness/template-answers.yml
 features:
   type: str
@@ -28,6 +28,11 @@ features:
     - worktree
     - verus
   choices: *available_tools
+project_guide:
+  type: str
+  multiline: true
+  default: ""
+  help: 本仓职责、源码位置和验证入口（可选，可直接在根指南追加）。
 generate_check:
   type: bool
   default: false
