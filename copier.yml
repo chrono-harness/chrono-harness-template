@@ -1,5 +1,6 @@
 _min_copier_version: "9.4.0"
 _subdirectory: scaffold
+_skip_if_exists: [AGENTS.md]
 _answers_file: .chrono-harness/template-answers.yml
 features:
   type: str
@@ -38,3 +39,9 @@ required_check:
   when: "{{ 'pr' in features }}"
   default: check
   help: PR 状态需要核对的 GitHub 检查名
+check_os:
+  type: str
+  when: "{{ generate_check }}"
+  help: 业务检查在哪个平台执行？
+  default: ubuntu-24.04
+  choices: [ubuntu-24.04, macos-15]
