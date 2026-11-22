@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 import tomllib
 
-empty, selected, full = map(Path, sys.argv[1:])
+empty, selected, full, bootstrap, release = map(Path, sys.argv[1:])
 manifest = Path(".config/mise/conf.d/chrono-harness.toml")
 assert not (empty / manifest).exists()
 config = tomllib.loads((selected / manifest).read_text())
@@ -27,3 +27,9 @@ assert default_tools.pop("rust") == {"version": "1.95.0", "profile": "minimal"}
 assert set(default_tools) == set(expected)
 for tool in default_tools.values():
     assert set(tool["platforms"]) == {"linux-x64", "macos-arm64"}
+
+for host, command in ((bootstrap, "chrono-host-bootstrap"), (release, "chrono-host-release")):
+    tools = tomllib.loads((host / manifest).read_text())["tools"]
+    assert set(tools) == {"http:" + command, "http:chrono-judge-registration"}
+    for name, declaration in tools.items():
+        assert declaration == default_tools[name]

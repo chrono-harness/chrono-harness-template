@@ -23,4 +23,8 @@ jobs:
           uvx --from copier==9.19.1 copier copy --defaults --vcs-ref HEAD \
             -d 'features=["pr"]' -d repository=chrono-harness/chrono-harness-template \
             -d generate_check=true -d 'check_command=python3 check.py' . "$RUNNER_TEMP/selected"
-      - run: python3 check.py "$RUNNER_TEMP/empty" "$RUNNER_TEMP/selected" "$RUNNER_TEMP/default"
+          for tool in host-bootstrap host-release; do
+            uvx --from copier==9.19.1 copier copy --defaults --vcs-ref HEAD \
+              -d "features=[\"$tool\"]" . "$RUNNER_TEMP/$tool"
+          done
+      - run: python3 check.py "$RUNNER_TEMP/empty" "$RUNNER_TEMP/selected" "$RUNNER_TEMP/default" "$RUNNER_TEMP/host-bootstrap" "$RUNNER_TEMP/host-release"
