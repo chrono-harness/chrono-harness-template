@@ -1,20 +1,9 @@
-# 本仓的 harness
+# 本仓工具
 
-开发分支为 `{{ dev_branch }}`，正式版从 `main` 发布。
-{% if features or generate_check %}
-在仓库根目录运行 `mise install`。版本和两平台 SHA-256 位于 `.config/mise/conf.d/chrono-harness.toml`。
-{% endif %}{% if generate_check %}
-- 本地与 CI 都用 `mise run harness-check` 执行业务检查。
-{% endif %}{% if 'pr' in features %}
-- 用 `mise exec -- chrono-pr pr-reminders` 查看本地待跟进 PR，再用 `pr-status --pr NUMBER --head-sha SHA` 读取 GitHub 的当前状态。
-{% endif %}{% if 'instructions' in features %}
-- 采用指令登记的项目可用 `mise exec -- chrono-instructions init --host-root .` 初始化，编辑登记源后运行 `mise exec -- chrono-instructions generate --host-root .`。
-{% endif %}{% if 'harness' in features %}
-- 采用登记式检查的宿主按其配置运行 `mise exec -- chrono-harness check`。
-{% endif %}{% if 'worktree' in features %}
-- 用 `mise exec -- chrono-worktree --help` 查看工作树管理命令。
-{% endif %}{% if 'ci' in features %}
-- 用 `mise exec -- chrono-ci --help` 查看工作流生成与校验命令。
-{% endif %}{% if 'verus' in features %}
-- 原生验证入口可从 PATH 使用本仓锁定的 `verus`。
+开发分支为 `{{ dev_branch }}`。{% if features or generate_check %}首次检出运行 `mise trust` 和 `mise install`。工具版本见 [.config/mise/conf.d/chrono-harness.toml](../.config/mise/conf.d/chrono-harness.toml)。{% endif %}
+{% if generate_check %}
+业务检查使用 `mise run harness-check`。
+{% endif %}
+{% if 'pr' in features %}
+用 `mise exec -- chrono-pr pr-reminders` 查看本地提醒，再运行 `mise exec -- chrono-pr pr-status --pr NUMBER --head-sha SHA` 查询 GitHub。
 {% endif %}
