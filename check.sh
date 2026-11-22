@@ -26,7 +26,12 @@ uv run --no-project --python ">=3.11" python check.py "$stage/empty" "$stage/sel
   for choice in '[]' '["instructions"]'; do
     uvx --from copier==9.19.1 copier update --defaults --vcs-ref HEAD \
       --answers-file .chrono-harness/template-answers.yml -d "features=$choice"
-    test -z "$(git ls-files --unmerged)"
+    echo "Verify tool choice $choice"
+    if [[ -n "$(git ls-files --unmerged)" ]]; then
+      git diff --cc -- CLAUDE.md
+      git ls-files --unmerged
+      exit 1
+    fi
     grep -Fxq '保留这条宿主指令。' AGENTS.md
     if [[ "$choice" = '[]' ]]; then
       test ! -f docs/licenses/trureturing-Apache-2.0.txt
