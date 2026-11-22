@@ -8,7 +8,7 @@ mise trust
 mise install
 ```
 
-每个仓库都得到公共工作说明 `CLAUDE.md`，以及指向它的相对符号链接 `AGENTS.md`。维护者可以直接在本仓 `CLAUDE.md` 末尾追加“本仓开发”，写明源码、测试和本地检查入口。该段由本仓维护，模板升级会合并已提交的定制。Agent 在本仓检出内即可读到两部分。
+每个仓库的 `AGENTS.md` 都是指向本仓 `CLAUDE.md` 的相对符号链接。公共约定由模板维护，随版本放入本仓 `.chrono-harness/USAGE.md`。维护者可以直接在本仓 `CLAUDE.md` 末尾追加“本仓开发”，写明源码、测试和本地检查入口。该段由本仓维护，模板升级会合并已提交的定制。Agent 在本仓检出内即可读到两部分。
 
 本仓选项保存在 `.chrono-harness/template-answers.yml`，本地命令见 `.chrono-harness/USAGE.md`。开发用 `dev`，通过验收的正式版从 `main` 发布。
 
