@@ -3,7 +3,7 @@
 在已有仓库的根目录运行 Copier。默认勾选全部 18 个 Chrono 命令和 Verus。用空格取消任意工具，也可以全部取消。工具从各自版本固定的发行下载，mise 按 SHA-256 校验，安装在工作树外。选中 Verus 会一并安装其依赖的 Rust 1.95.0。支持 Linux x86_64 和 macOS arm64。
 
 ```sh
-uvx --from copier==9.19.1 copier copy --vcs-ref v0.1.0-alpha.7 gh:chrono-harness/chrono-harness-template .
+uvx --from copier==9.19.1 copier copy --vcs-ref v0.1.0-alpha.8 gh:chrono-harness/chrono-harness-template .
 mise trust
 mise run harness-setup
 ```
