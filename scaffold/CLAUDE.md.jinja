@@ -1,4 +1,4 @@
-# {{ repository if 'pr' in features else _folder_name }} 工作说明
+# {{ repository ~ ' 工作说明' if 'pr' in features else '本仓工作说明' }}
 
 {% if project_guide %}
 {{ project_guide }}
