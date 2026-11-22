@@ -1,13 +1,15 @@
 # chrono-harness 仓库模板
 
-新建仓库时，在 GitHub 的 **Use this template** 中创建 `chrono-harness-<业务名>`。每个仓库的 `mise.toml` 固定基础工具的版本、所属仓库的发行地址，以及 Linux x86_64 和 macOS arm64 的 SHA-256。
-
-本地安装 [mise](https://mise.jdx.dev/getting-started.html) 后，在仓库根目录运行：
+在新仓库或已有仓库的根目录运行一次 Copier，选择这个项目实际使用的工具。可留空，可多选。选装工具的发行版本、平台地址和 SHA-256 都写入本仓配置。
 
 ```sh
+uvx --from copier==9.19.1 copier copy --vcs-ref v0.1.0-alpha.1 gh:chrono-harness/chrono-harness-template .
 mise trust
 mise install
-mise exec -- chrono-pr pr-reminders
 ```
 
-安装的二进制由 mise 管理，位置在工作树外。升级某个工具时只改该工具的版本、下载地址和校验值；回退时使用该工具上一已验版本的数据。GitHub Actions 使用相同清单安装。业务工具及 Rust 等开发依赖由各仓库按需选择。
+选择“生成业务检查”并填写项目现有的测试命令，模板会生成 GitHub Actions 和本地入口。维护者与 AI 都能运行 `mise run harness-check`。已有 CI 可以保留其入口，只选所需工具。
+
+每个宿主的选择保存于 `.chrono-harness/template-answers.yml`，使用说明在 `.chrono-harness/USAGE.md`。运行 `uvx --from copier==9.19.1 copier recopy --answers-file .chrono-harness/template-answers.yml` 可以调整选择。工具由 mise 安装在工作树外。升级或回退某个工具，只需调整该仓对应的发行版本、地址及校验值。
+
+开发分支为 `dev`。正式版使用从 `dev` 验收后晋升到 `main` 的提交。

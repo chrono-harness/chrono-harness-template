@@ -15,4 +15,6 @@
 - 用 `mise exec -- chrono-worktree --help` 查看工作树管理命令。
 {% endif %}{% if 'ci' in features %}
 - 用 `mise exec -- chrono-ci --help` 查看工作流生成与校验命令。
+{% endif %}{% if 'verus' in features %}
+- 原生验证入口可从 PATH 使用本仓锁定的 `verus`。
 {% endif %}
