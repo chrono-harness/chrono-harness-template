@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 import tomllib
 
-empty, selected, full, bootstrap, release, inputs, routes, cost = map(Path, sys.argv[1:])
+empty, selected, full, bootstrap, release, inputs, routes, cost, worktree = map(Path, sys.argv[1:])
 manifest = Path(".config/mise/conf.d/chrono-harness.toml")
 assert not (empty / manifest).exists()
 config = tomllib.loads((selected / manifest).read_text())
@@ -45,6 +45,7 @@ for tool in default_tools.values():
 
 assert "业务源码位于 src/。" in (selected / "AGENTS.md").read_text()
 for host, commands in [
+    (worktree, {"chrono-worktree", "chrono-judge-registration"}),
     (bootstrap, {"chrono-host-bootstrap", "chrono-judge-registration"}),
     (release, {"chrono-host-release", "chrono-judge-registration"}),
     (inputs, {"chrono-inputs", "chrono-judge-routes", "chrono-judge-filemap"}),
