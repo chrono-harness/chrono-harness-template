@@ -16,7 +16,17 @@ assert config["tasks"]["harness-check"]["run"] == "python3 check.py"
 for host in (empty, selected, full):
     assert (host / "AGENTS.md").readlink() == Path("CLAUDE.md")
     assert (host / "CLAUDE.md").is_file()
-    assert not (host / ".chrono-harness/rules.json").exists()
+    guide = (host / "AGENTS.md").read_text()
+    assert guide == (host / "CLAUDE.md").read_text()
+    if host == full:
+        assert json.loads((host / ".chrono-harness/rules.json").read_text()) == {"mode": "all"}
+        assert "## job.wait" in guide and "## artifact.cleanup" in guide
+        assert "mise run harness-setup" in guide
+        assert (host / "docs/licenses/trureturing-Apache-2.0.txt").is_file()
+    else:
+        assert not (host / ".chrono-harness/rules.json").exists()
+        assert "## job.wait" not in guide
+        assert not (host / "docs/licenses/trureturing-Apache-2.0.txt").exists()
     assert not (host / ".chrono-harness/instructions").exists()
     usage = (host / ".chrono-harness/USAGE.md").read_text()
     assert ("chrono-instructions rules --host-root ." in usage) == (host == full)

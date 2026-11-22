@@ -1,7 +1,7 @@
 _min_copier_version: "9.4.0"
 _subdirectory: scaffold
 _preserve_symlinks: true
-_skip_if_exists: [CLAUDE.md]
+_skip_if_exists: [CLAUDE.md, .chrono-harness/rules.json]
 _answers_file: .chrono-harness/template-answers.yml
 features:
   type: str

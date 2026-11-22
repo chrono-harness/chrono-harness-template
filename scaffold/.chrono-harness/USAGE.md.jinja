@@ -4,7 +4,7 @@
 {% if features or generate_check %}
 首次检出运行 `mise trust` 和 `mise run harness-setup`。工具版本见 [.config/mise/conf.d/chrono-harness.toml](../.config/mise/conf.d/chrono-harness.toml)。{% endif %}
 {% if 'instructions' in features %}
-开始每项任务时运行 `mise exec -- chrono-instructions rules --host-root .`，读取并遵循标准输出中的上游规则。仓库追加说明见根 `CLAUDE.md`。
+根 [CLAUDE.md](../CLAUDE.md) 包含本仓接纳的基础指令全文。规则选择在 `.chrono-harness/rules.json`。开始每项任务时运行 `mise exec -- chrono-instructions rules --host-root .`，读取并遵循标准输出中的上游规则。仓库追加说明见根 `CLAUDE.md`。
 {% endif %}
 {% if generate_check %}
 业务检查使用 `mise run harness-check`。
