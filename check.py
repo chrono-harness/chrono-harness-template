@@ -16,6 +16,10 @@ assert config["tasks"]["harness-check"]["run"] == "python3 check.py"
 for host in (empty, selected, full):
     assert (host / "AGENTS.md").readlink() == Path("CLAUDE.md")
     assert (host / "CLAUDE.md").is_file()
+    assert not (host / ".chrono-harness/rules.json").exists()
+    assert not (host / ".chrono-harness/instructions").exists()
+    usage = (host / ".chrono-harness/USAGE.md").read_text()
+    assert ("chrono-instructions rules --host-root ." in usage) == (host == full)
 
 expected = ['http:chrono-cache', 'http:chrono-ci', 'http:chrono-distribution', 'http:chrono-harness', 'http:chrono-host-bootstrap', 'http:chrono-host-release', 'http:chrono-inputs', 'http:chrono-instructions', 'http:chrono-judge-ci', 'http:chrono-judge-cost', 'http:chrono-judge-filemap', 'http:chrono-judge-mixed', 'http:chrono-judge-projects', 'http:chrono-judge-registration', 'http:chrono-judge-routes', 'http:chrono-judge-workflow', 'http:chrono-pr', 'http:chrono-worktree', 'http:verus']
 default_tools = tomllib.loads((full / manifest).read_text())["tools"]

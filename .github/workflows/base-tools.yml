@@ -29,6 +29,6 @@ jobs:
           verus --version
           chrono-pr pr-reminders
           mise run harness-setup
-          git diff --exit-code -- CLAUDE.md .chrono-harness/instructions
-          test -f .chrono-harness/instructions/manifest.json
+          chrono-instructions rules --host-root . > /dev/null
+          test ! -e .chrono-harness/instructions/catalog.json
           test "$(readlink AGENTS.md)" = CLAUDE.md
