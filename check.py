@@ -19,6 +19,7 @@ for host in (empty, selected, full):
 
 expected = ['http:chrono-cache', 'http:chrono-ci', 'http:chrono-distribution', 'http:chrono-harness', 'http:chrono-host-bootstrap', 'http:chrono-host-release', 'http:chrono-inputs', 'http:chrono-instructions', 'http:chrono-judge-ci', 'http:chrono-judge-cost', 'http:chrono-judge-filemap', 'http:chrono-judge-mixed', 'http:chrono-judge-projects', 'http:chrono-judge-registration', 'http:chrono-judge-routes', 'http:chrono-judge-workflow', 'http:chrono-pr', 'http:chrono-worktree', 'http:verus']
 default_tools = tomllib.loads((full / manifest).read_text())["tools"]
+assert default_tools.pop("rust") == {"version": "1.95.0", "profile": "minimal"}
 assert set(default_tools) == set(expected)
 for tool in default_tools.values():
     assert set(tool["platforms"]) == {"linux-x64", "macos-arm64"}
