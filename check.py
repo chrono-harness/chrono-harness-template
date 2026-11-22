@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 import tomllib
 
-empty, selected, full, bootstrap, release = map(Path, sys.argv[1:])
+empty, selected, full, bootstrap, release, inputs, routes, cost = map(Path, sys.argv[1:])
 manifest = Path(".config/mise/conf.d/chrono-harness.toml")
 assert not (empty / manifest).exists()
 config = tomllib.loads((selected / manifest).read_text())
@@ -29,17 +29,29 @@ for host in (empty, selected, full):
         assert not (host / "docs/licenses/trureturing-Apache-2.0.txt").exists()
     assert not (host / ".chrono-harness/instructions").exists()
     usage = (host / ".chrono-harness/USAGE.md").read_text()
-    assert ("chrono-instructions rules --host-root ." in usage) == (host == full)
+    assert ("刷新根指南" in usage) == (host == full)
 
 expected = ['http:chrono-cache', 'http:chrono-ci', 'http:chrono-distribution', 'http:chrono-harness', 'http:chrono-host-bootstrap', 'http:chrono-host-release', 'http:chrono-inputs', 'http:chrono-instructions', 'http:chrono-judge-ci', 'http:chrono-judge-cost', 'http:chrono-judge-filemap', 'http:chrono-judge-mixed', 'http:chrono-judge-projects', 'http:chrono-judge-registration', 'http:chrono-judge-routes', 'http:chrono-judge-workflow', 'http:chrono-pr', 'http:chrono-worktree', 'http:verus']
-default_tools = tomllib.loads((full / manifest).read_text())["tools"]
+default_config = tomllib.loads((full / manifest).read_text())
+assert default_config["tasks"]["harness-setup"]["run"] == [
+    "mise install", "mise exec -- chrono-instructions sync-rules --host-root ."
+]
+assert config["tasks"]["harness-setup"]["run"] == "mise install"
+default_tools = default_config["tools"]
 assert default_tools.pop("rust") == {"version": "1.95.0", "profile": "minimal"}
 assert set(default_tools) == set(expected)
 for tool in default_tools.values():
     assert set(tool["platforms"]) == {"linux-x64", "macos-arm64"}
 
-for host, command in ((bootstrap, "chrono-host-bootstrap"), (release, "chrono-host-release")):
+assert "业务源码位于 src/。" in (selected / "AGENTS.md").read_text()
+for host, commands in [
+    (bootstrap, {"chrono-host-bootstrap", "chrono-judge-registration"}),
+    (release, {"chrono-host-release", "chrono-judge-registration"}),
+    (inputs, {"chrono-inputs", "chrono-judge-routes", "chrono-judge-filemap"}),
+    (routes, {"chrono-judge-routes", "chrono-judge-filemap"}),
+    (cost, {"chrono-judge-cost", "chrono-judge-filemap", "chrono-judge-registration"}),
+]:
     tools = tomllib.loads((host / manifest).read_text())["tools"]
-    assert set(tools) == {"http:" + command, "http:chrono-judge-registration"}
+    assert set(tools) == {"http:" + command for command in commands}
     for name, declaration in tools.items():
         assert declaration == default_tools[name]
