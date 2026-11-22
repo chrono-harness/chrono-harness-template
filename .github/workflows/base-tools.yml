@@ -1,9 +1,9 @@
 name: Install base tools
 on:
   push:
-    paths: [mise.toml, .github/workflows/base-tools.yml]
+    paths: [.config/mise/conf.d/chrono-harness.toml, .github/workflows/base-tools.yml]
   pull_request:
-    paths: [mise.toml, .github/workflows/base-tools.yml]
+    paths: [.config/mise/conf.d/chrono-harness.toml, .github/workflows/base-tools.yml]
   workflow_dispatch:
 permissions:
   contents: read
@@ -25,5 +25,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          mise ls --current
+          verus --version
           chrono-pr pr-reminders
           chrono-instructions --version
