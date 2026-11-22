@@ -160,3 +160,9 @@ macos-arm64 = { url = "https://github.com/verus-lang/verus/releases/download/rel
 description = "Run the registered business check"
 run = {{ check_command | to_json }}
 {% endif %}
+
+{% if features or generate_check %}
+[tasks.harness-setup]
+description = "Install this repository's tools and initialize its selected agent rules"
+run = [{% if 'instructions' in features %}"mise install", "chrono-instructions init --host-root ."{% else %}"mise install"{% endif %}]
+{% endif %}

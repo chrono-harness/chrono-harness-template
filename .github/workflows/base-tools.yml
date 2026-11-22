@@ -28,4 +28,7 @@ jobs:
           mise ls --current
           verus --version
           chrono-pr pr-reminders
-          chrono-instructions --version
+          mise run harness-setup
+          git diff --exit-code -- CLAUDE.md .chrono-harness/instructions
+          test -f .chrono-harness/instructions/manifest.json
+          test "$(readlink AGENTS.md)" = CLAUDE.md
