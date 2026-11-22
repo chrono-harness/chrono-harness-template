@@ -1,0 +1,39 @@
+_min_copier_version: "9.4.0"
+_subdirectory: scaffold
+_answers_file: .chrono-harness/template-answers.yml
+features:
+  type: str
+  multiselect: true
+  help: 这个仓库需要哪些工具？可多选，也可留空。
+  default: []
+  choices:
+    "PR 创建、查询和本地提醒": pr
+    "项目指令生成": instructions
+    "已登记的 harness 检查与 CI 判官": harness
+    "工作树管理": worktree
+    "CI 工作流生成": ci
+    "外部登记判官": registration
+generate_check:
+  type: bool
+  default: false
+  help: 是否为业务检查生成本地命令和 GitHub Actions？已有检查入口的仓库可以保留自己的工作流。
+check_command:
+  type: str
+  when: "{{ generate_check }}"
+  default: ./check.sh
+  help: 仓库已有的业务检查命令
+  validator: "{% if not check_command.strip() %}请输入业务检查命令{% endif %}"
+repository:
+  type: str
+  when: "{{ 'pr' in features }}"
+  help: GitHub 仓库 owner/name
+  validator: "{% if not (repository | regex_search('^[A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9][A-Za-z0-9_.-]*$')) %}请输入 owner/name{% endif %}"
+dev_branch:
+  type: str
+  default: dev
+  help: 开发分支。正式版使用 main。
+required_check:
+  type: str
+  when: "{{ 'pr' in features }}"
+  default: check
+  help: PR 状态需要核对的 GitHub 检查名

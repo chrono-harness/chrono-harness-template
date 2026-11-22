@@ -1,0 +1,11 @@
+{
+  "schema": "chrono-pr-config/v3",
+  "repository": {{ repository | to_json }},
+  "base": {{ dev_branch | to_json }},
+  "gh": "gh",
+  "required_checks": [{{ required_check | to_json }}],
+  "api_timeout_seconds": 60,
+  "watch_timeout_seconds": 3600,
+  "watch_interval_seconds": 60,
+  "output_limit_bytes": 1048576
+}
