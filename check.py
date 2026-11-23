@@ -48,7 +48,7 @@ for host, commands in [
     (worktree, {"chrono-worktree", "chrono-judge-registration"}),
     (bootstrap, {"chrono-host-bootstrap", "chrono-judge-registration"}),
     (release, {"chrono-host-release", "chrono-judge-registration"}),
-    (inputs, {"chrono-inputs", "chrono-judge-routes", "chrono-judge-filemap", "chrono-judge-mixed"}),
+    (inputs, {"chrono-inputs", "chrono-judge-registration", "chrono-judge-routes", "chrono-judge-filemap", "chrono-judge-mixed"}),
     (mixed, {"chrono-judge-mixed", "chrono-judge-registration"}),
     (filemap, {"chrono-judge-filemap", "chrono-judge-mixed"}),
     (routes, {"chrono-judge-routes", "chrono-judge-filemap"}),
