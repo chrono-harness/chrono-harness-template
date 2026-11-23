@@ -3,10 +3,12 @@
 在已有仓库的根目录运行 Copier。默认勾选全部 18 个 Chrono 命令和 Verus。用空格取消任意工具，也可以全部取消。工具从各自版本固定的发行下载，mise 按 SHA-256 校验，安装在工作树外。选中 Verus 会一并安装其依赖的 Rust 1.95.0。选中 worktree、host-bootstrap 或 host-release 时会一并安装它查询项目登记所需的 chrono-judge-registration。选装 host-release 还会安装校验原始构建报告的 host-bootstrap。单选 judge-mixed 会安装 registration，用于原生判官协议。单选 judge-filemap 会安装 mixed，用于判定变更影响的测试。单选 inputs 会为 capture 及带执行单元的 compose 安装 registration。带执行单元的 compose 还使用 routes、FILEMAP 和 mixed。pair 和无执行单元的 compose 可离线单独运行。单选 judge-projects 会安装 FILEMAP，用于读取受影响的节点。单选 judge-workflow 会安装 projects，用于核验执行结果和收集凭证。单选 judge-ci 会安装 FILEMAP 和 projects，用于按变更选择测试及核对项目配对。完整调度和收集使用随装的 routes 与 mixed。单选 routes 只需随装 FILEMAP。单选 judge-cost 会安装 FILEMAP 和 registration。只生成工作流的仓库可以单选 ci。需要按变更调度执行单元或汇总其报告时，同时选择 ci 和 judge-ci。支持 Linux x86_64 和 macOS arm64。
 
 ```sh
-uvx --from copier==9.19.1 copier copy --vcs-ref v0.1.0-alpha.22 gh:chrono-harness/chrono-harness-template .
+uvx --from copier==9.19.1 copier copy --prereleases gh:chrono-harness/chrono-harness-template .
 mise trust
 mise run harness-setup
 ```
+
+首次安装选择最新的发布标签，包含预发行版。Copier 将选中的标签和本仓答案写入 `.chrono-harness/template-answers.yml`。
 
 安装时可填写本仓职责、源码位置和验证命令，模板会将它们直接写入根指南。每个仓库的 `AGENTS.md` 链接到本仓的 `CLAUDE.md`。默认生成的根文件包含首次安装、PR 与验证入口，以及 chrono-harness-instructions 发布的默认规则全文。克隆仓库即可阅读。工具的版本和校验值在本仓的 mise 清单中。
 
