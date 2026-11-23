@@ -53,11 +53,11 @@ for host, commands in [
     (release, {"chrono-host-release", "chrono-host-bootstrap", "chrono-judge-registration"}),
     (inputs, {"chrono-inputs", "chrono-judge-registration", "chrono-judge-routes", "chrono-judge-filemap", "chrono-judge-mixed"}),
     (workflow, {"chrono-judge-workflow", "chrono-judge-projects", "chrono-judge-routes", "chrono-judge-registration"}),
-    (projects, {"chrono-judge-projects", "chrono-judge-filemap", "chrono-judge-routes"}),
+    (projects, {"chrono-judge-projects", "chrono-judge-filemap", "chrono-judge-routes", "chrono-judge-registration"}),
     (judge_ci, {"chrono-judge-ci", "chrono-judge-projects", "chrono-judge-filemap", "chrono-judge-routes", "chrono-judge-mixed", "chrono-judge-registration"}),
     (mixed, {"chrono-judge-mixed", "chrono-judge-registration"}),
     (filemap, {"chrono-judge-filemap", "chrono-judge-mixed", "chrono-judge-registration"}),
-    (routes, {"chrono-judge-routes", "chrono-judge-filemap"}),
+    (routes, {"chrono-judge-routes", "chrono-judge-filemap", "chrono-judge-registration"}),
     (cost, {"chrono-judge-cost", "chrono-judge-filemap", "chrono-judge-registration"}),
 ]:
     assert (host / "AGENTS.md").read_text().splitlines()[0] == "# chrono-harness/chrono-harness-template 工作说明"
