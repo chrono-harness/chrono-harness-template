@@ -4,6 +4,7 @@ dev_branch: dev
 features:
 - cache
 - ci
+- diagnostics
 - distribution
 - harness
 - host-bootstrap
