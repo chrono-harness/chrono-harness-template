@@ -10,6 +10,7 @@ features:
   default: &available_tools
     - cache
     - ci
+    - diagnostics
     - distribution
     - harness
     - host-bootstrap
