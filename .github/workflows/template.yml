@@ -14,4 +14,4 @@ jobs:
         with:
           persist-credentials: false
       - run: pipx install uv
-      - run: ./check.sh
+      - run: ./tests/check.sh

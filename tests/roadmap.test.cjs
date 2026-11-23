@@ -1,6 +1,6 @@
 const test = require('node:test')
 const assert = require('node:assert/strict')
-const sync = require('./.github/roadmap.cjs')
+const sync = require('../.github/roadmap.cjs')
 
 test('new work, release publication, closing and reopening reconcile against current GitHub state', async () => {
   const items = [{number: 1, state: 'open'}, {number: 2, state: 'open', pull_request: {}}]
