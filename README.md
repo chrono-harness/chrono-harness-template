@@ -44,3 +44,5 @@ uvx --from copier==9.19.1 copier update --vcs-ref :current: --answers-file .chro
 模板默认启用 `manage_roadmap`。在仓库的 **Issues → Milestones** 查看本仓路线图。新建或重开的事项保留已有里程碑。未分配事项进入 `.chrono-harness/release.json` 的 `version` 所对应的里程碑（例如 `v0.1.0`）。尚未制定版本计划或该版本已经正式发布时，事项进入 `Backlog`。维护者可以随时调整单项归属。PR 的 `Closes #123` 由 GitHub 在合入默认分支时关闭对应事项。
 
 实际发布的测试版和正式版显示在对应版本的里程碑里。正式版公开且该里程碑开放事项为零时自动关闭。重开其中的事项会恢复里程碑。选择 `publisher_workflow` 时填写本仓发布工作流的名称，以接收 Actions 使用仓库令牌发布后的完成事件。手动运行 `Issue roadmap` 可从 GitHub 当前数据重算。工作流只在本仓读 Release 和写 Issues、Milestones。
+
+发布工作流返回失败或超时时，路线图按 GitHub run ID 创建一条带 `release-failure` 标签的 Issue，保留提交及原尝试链接。同一运行重试成功会关闭该事项；新版本的修复可用 PR 的关闭引用关联原故障。
