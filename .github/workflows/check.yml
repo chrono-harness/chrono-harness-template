@@ -1,0 +1,27 @@
+name: Harness setup
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  setup:
+    name: check
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@924e7c586e33d7d4bae9c14e26c5d22e2beb6e78
+        with:
+          version: 2026.11.12
+          cache: false
+          install: false
+      - run: mise run harness-setup
+      - name: Verify the host selected by this checkout
+        env:
+          HOST_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          test "$(readlink AGENTS.md)" = CLAUDE.md
+          if mise which chrono-pr > /dev/null 2>&1; then
+            jq -e --arg r "$GITHUB_REPOSITORY" --arg b "$HOST_BRANCH" '.repository == $r and .base == $b' .chrono-harness/pr.json
+            mise exec -- chrono-pr pr-reminders
+          fi
