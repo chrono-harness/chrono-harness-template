@@ -11,7 +11,7 @@ uvx --from copier==9.19.1 copier copy --defaults --vcs-ref HEAD \
   -d 'project_guide=业务源码位于 src/。' -d generate_check=true -d 'check_command=python3 check.py' . "$stage/selected"
 # Render the self-hosted publisher and both choices of the host release contract.
 source_plan=$(cat .chrono-harness/release.json)
-binary_plan=$(python3 -c 'import json,sys; p=json.load(sys.stdin); p.update(kind="binary",binary="demo",build="tools/build.sh"); print(json.dumps(p))' < .chrono-harness/release.json)
+binary_plan=$(python3 -c 'import json,sys; p=json.load(sys.stdin); p.update(kind="binary",version_policy="explicit",binary="demo",build="tools/build.sh"); print(json.dumps(p))' < .chrono-harness/release.json)
 for kind in copier binary; do
   plan=$source_plan
   if [[ "$kind" == binary ]]; then plan=$binary_plan; fi

@@ -172,5 +172,47 @@ class CopierPromotion(unittest.TestCase):
                 self.promote()
 
 
+class NextSourceCycle(CopierPromotion):
+    config = dict(CopierPromotion.config, version_policy="next_patch")
+
+    def setUp(self):
+        super().setUp()
+        self.preview = "v0.1.1-alpha.15"
+        self.answers = "_src_path: gh:" + self.source + "\n_commit: " + self.preview
+        self.release["tag_name"] = self.preview
+        self.previous = "c" * 40
+        self.candidate_relation = "ahead"
+
+    def response(self, path):
+        if "/releases?" in path:
+            return [{"tag_name": "v0.1.0", "published_at": "2026-01-10", "draft": False, "prerelease": False},
+                    {"tag_name": "v7.0.0", "published_at": None, "draft": True, "prerelease": False}]
+        if path.endswith("/git/ref/tags/v0.1.0"):
+            return {"object": {"type": "commit", "sha": self.previous}}
+        if path.endswith(self.previous + "..." + sha):
+            return {"status": self.candidate_relation}
+        if "/git/matching-refs/" in path:
+            return []
+        return super().response(path)
+
+    def test_stable_semver_increments_and_host_can_plan_a_major(self):
+        self.assertEqual(self.promote()["tag"], "v0.1.1")
+        with patch.object(plan, "api", side_effect=self.response):
+            target, _ = plan.next_target(dict(self.config, version="2.0.0"), self.source)
+        self.assertEqual(target["version"], "2.0.0")
+
+    def test_previously_released_source_is_terminal(self):
+        for relation in ("identical", "behind"):
+            self.candidate_relation = relation
+            self.assertEqual(self.promote(), {"mode": "complete", "sha": self.previous, "tag": "v0.1.0"})
+        self.candidate_relation = "diverged"
+        with self.assertRaisesRegex(ValueError, "diverges"):
+            self.promote()
+
+    def test_source_plan_never_relabels_a_binary(self):
+        with self.assertRaisesRegex(ValueError, "Copier"):
+            plan.next_target(dict(self.config, kind="binary"), self.source)
+
+
 if __name__ == "__main__":
     unittest.main()

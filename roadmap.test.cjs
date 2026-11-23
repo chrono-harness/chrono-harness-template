@@ -62,6 +62,14 @@ test('new work, release publication, closing and reopening reconcile against cur
   items[2].state = 'open'
   await run()
   assert.equal(target.state, 'open')
+  items.push({number: 5, state: 'open'})
+  const rolling = {kind: 'copier', version: '1.2.0', version_policy: 'next_patch'}
+  await run(rolling)
+  assert.equal(items.at(-1).milestone, milestones.find(m => m.title === 'v1.2.1').number)
+  items.push({number: 6, state: 'open'})
+  await run({...rolling, version: '2.0.0'})
+  assert.equal(items.at(-1).milestone, milestones.find(m => m.title === 'v2.0.0').number)
+  await assert.rejects(run({...rolling, kind: 'binary'}), /Copier/)
   await assert.rejects(run({version: 'not-a-version'}), /Expected version/)
 })
 
