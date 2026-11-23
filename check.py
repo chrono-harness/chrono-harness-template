@@ -51,7 +51,7 @@ for host, commands in [
     (inputs, {"chrono-inputs", "chrono-judge-registration", "chrono-judge-routes", "chrono-judge-filemap", "chrono-judge-mixed"}),
     (workflow, {"chrono-judge-workflow", "chrono-judge-projects"}),
     (projects, {"chrono-judge-projects", "chrono-judge-filemap"}),
-    (judge_ci, {"chrono-judge-ci", "chrono-judge-projects"}),
+    (judge_ci, {"chrono-judge-ci", "chrono-judge-projects", "chrono-judge-filemap", "chrono-judge-routes", "chrono-judge-mixed"}),
     (mixed, {"chrono-judge-mixed", "chrono-judge-registration"}),
     (filemap, {"chrono-judge-filemap", "chrono-judge-mixed"}),
     (routes, {"chrono-judge-routes", "chrono-judge-filemap"}),
