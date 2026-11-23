@@ -74,3 +74,21 @@ publisher_workflow:
   when: "{{ manage_roadmap }}"
   default: Release
   help: 本仓发布工作流的 name。GitHub Actions 发布完成后用它同步路线图。
+release_plan:
+  type: json
+  default: {}
+  help: 可选的独立发布配置。填写版本、产品类型、开发检查和真实下游验收。留空可沿用宿主已有的发布方式。
+  validator: |
+    {%- if release_plan -%}
+    {%- set p = release_plan -%}
+    {%- if p is not mapping or p.kind not in ["copier", "binary"] or not (p.version | default("") | regex_search("^[0-9]+[.][0-9]+[.][0-9]+$"))
+        or p.check is not mapping or not p.check.name or not p.check.file
+        or p.consumer is not mapping or not p.consumer.repository or not p.consumer.branch or not p.consumer.workflow
+        or not p.consumer.pin or not p.consumer.jobs or p.consumer.jobs is string or not p.consumer.step -%}
+    请填写 kind、version、check 和完整的 consumer 验收配置
+    {%- elif p.kind == "binary" and (not (p.binary | default("") | regex_search("^[A-Za-z0-9_-]+$"))
+         or not (p.build | default("") | regex_search("^[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*$"))
+         or ".." in p.build.split("/")) -%}
+    请填写二进制名称 binary 和宿主内的构建入口 build
+    {%- endif -%}
+    {%- endif -%}

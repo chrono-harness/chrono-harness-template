@@ -1,0 +1,117 @@
+{% raw %}name: Release
+on:
+  workflow_run:
+    workflows: [{% endraw %}{{ release_plan.check.name | tojson }}{% raw %}]
+    types: [completed]
+    branches: [dev, main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: release-${{ github.event.workflow_run.id || github.run_id }}
+  cancel-in-progress: false
+jobs:
+  source:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-24.04
+    outputs:
+      mode: ${{ steps.plan.outputs.mode }}
+      sha: ${{ steps.plan.outputs.sha }}
+      tag: ${{ steps.plan.outputs.tag }}
+      preview: ${{ steps.plan.outputs.preview }}
+      proof: ${{ steps.plan.outputs.proof }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+{% endraw %}{% if release_plan.kind == "copier" %}{% raw %}      - name: Install the Copier answers parser
+        run: |
+          python3 -m venv "$RUNNER_TEMP/release-python"
+          "$RUNNER_TEMP/release-python/bin/pip" install PyYAML==6.0.3
+          echo "$RUNNER_TEMP/release-python/bin" >> "$GITHUB_PATH"
+{% endraw %}{% endif %}{% raw %}      - id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/release/plan.py
+{% endraw %}{% if release_plan.kind == "binary" %}{% raw %}  build:
+    needs: source
+    if: needs.source.outputs.mode == 'preview'
+    strategy:
+      matrix:
+        include:
+          - runner: macos-15
+            platform: macos-aarch64
+          - runner: ubuntu-24.04
+            platform: linux-x86_64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: refs/heads/dev
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Bind the already checked commit from this repository's development branch
+        env:
+          SOURCE_SHA: ${{ needs.source.outputs.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          git merge-base --is-ancestor "$SOURCE_SHA" HEAD
+          git checkout --detach "$SOURCE_SHA"
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+      - name: Build and exercise the release binary
+        shell: bash
+        env:
+          PLATFORM: ${{ matrix.platform }}
+          CARGO_TARGET_DIR: ${{ runner.temp }}/target
+        run: |
+          set -euo pipefail
+          mkdir "$RUNNER_TEMP/dist"
+          build=$(jq -er .build .chrono-harness/release.json)
+          "./$build" "$PLATFORM" "$RUNNER_TEMP/dist"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ${{ matrix.platform }}
+          path: ${{ runner.temp }}/dist/
+          if-no-files-found: error
+          retention-days: 1
+{% endraw %}{% endif %}{% raw %}  publish:
+{% endraw %}{% if release_plan.kind == "binary" %}{% raw %}    needs: [source, build]
+    if: >-
+      always() && needs.source.result == 'success' && needs.source.outputs.mode != 'complete' &&
+      (needs.build.result == 'success' || (needs.source.outputs.mode == 'stable' && needs.build.result == 'skipped'))
+{% endraw %}{% else %}{% raw %}    needs: source
+    if: >-
+      needs.source.result == 'success' && needs.source.outputs.mode != 'complete'
+{% endraw %}{% endif %}{% raw %}    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      actions: read
+    concurrency:
+      group: publish-${{ needs.source.outputs.tag }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+{% endraw %}{% if release_plan.kind == "binary" %}{% raw %}      - if: needs.source.outputs.mode == 'preview'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          path: ${{ runner.temp }}/dist
+          merge-multiple: true
+{% endraw %}{% endif %}{% raw %}      - name: Verify and publish the selected release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MODE: ${{ needs.source.outputs.mode }}
+          SOURCE_SHA: ${{ needs.source.outputs.sha }}
+          TAG: ${{ needs.source.outputs.tag }}
+          PREVIEW: ${{ needs.source.outputs.preview }}
+          PROOF: ${{ needs.source.outputs.proof }}
+          DIST: ${{ runner.temp }}/dist
+        run: python3 .github/release/publish.py
+{% endraw %}
