@@ -4,7 +4,6 @@ import json
 import os
 import re
 import subprocess
-import sys
 from pathlib import Path
 from urllib.parse import urlencode
 
@@ -107,7 +106,7 @@ def consumer_pin(config, repository, sha):
 
 
 def plan(config, repository, event, event_name):
-    require(config["kind"] in ("copier","binary"), "unsupported release product")
+    require(config["kind"] in ("copier", "binary"), "unsupported release product")
     check_workflow = config["check"]["file"]
     version = config["version"]
     require(re.fullmatch(r"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)", version), "invalid release version")
@@ -126,7 +125,11 @@ def plan(config, repository, event, event_name):
             if any(ref["ref"] == "refs/tags/" + stable_tag for ref in api(path)):
                 stable = api(f"repos/{repository}/releases/tags/{stable_tag}")
                 if not stable["draft"] and not stable["prerelease"]:
-                    return {"mode":"complete", "sha":sha, "tag":stable_tag}
+                    require(stable["tag_name"] == stable_tag, "different stable release")
+                    released = sha_of(repository, "tags/" + stable_tag)
+                    require(api(f"repos/{repository}/compare/{released}...main")["status"] in ("identical", "ahead"),
+                            "main does not contain the published stable release")
+                    return {"mode": "complete", "sha": released, "tag": stable_tag}
             return {"mode": "preview", "sha": sha, "tag": f"v{version}-alpha.{run['run_number']}"}
     else:
         require(event_name == "workflow_dispatch" and event["ref"] == "refs/heads/dev", "dispatch from dev")

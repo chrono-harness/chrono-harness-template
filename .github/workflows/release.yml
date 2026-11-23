@@ -29,17 +29,14 @@ jobs:
         with:
           persist-credentials: false
       - name: Install the Copier answers parser
-        if: true
-        run: python3 -m venv "$RUNNER_TEMP/release-python" && "$RUNNER_TEMP/release-python/bin/pip" install PyYAML==6.0.3
+        run: |
+          python3 -m venv "$RUNNER_TEMP/release-python"
+          "$RUNNER_TEMP/release-python/bin/pip" install PyYAML==6.0.3
+          echo "$RUNNER_TEMP/release-python/bin" >> "$GITHUB_PATH"
       - id: plan
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          if [[ -x "$RUNNER_TEMP/release-python/bin/python" ]]; then
-            "$RUNNER_TEMP/release-python/bin/python" .github/release/plan.py
-          else
-            python3 .github/release/plan.py
-          fi
+        run: python3 .github/release/plan.py
   publish:
     needs: source
     if: >-
