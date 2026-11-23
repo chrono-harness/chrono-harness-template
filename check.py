@@ -47,7 +47,7 @@ assert "业务源码位于 src/。" in (selected / "AGENTS.md").read_text()
 for host, commands in [
     (worktree, {"chrono-worktree", "chrono-judge-registration"}),
     (bootstrap, {"chrono-host-bootstrap", "chrono-judge-registration"}),
-    (release, {"chrono-host-release", "chrono-judge-registration"}),
+    (release, {"chrono-host-release", "chrono-host-bootstrap", "chrono-judge-registration"}),
     (inputs, {"chrono-inputs", "chrono-judge-registration", "chrono-judge-routes", "chrono-judge-filemap", "chrono-judge-mixed"}),
     (workflow, {"chrono-judge-workflow", "chrono-judge-projects"}),
     (projects, {"chrono-judge-projects", "chrono-judge-filemap"}),
