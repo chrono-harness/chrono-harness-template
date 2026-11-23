@@ -74,3 +74,8 @@ publisher_workflow:
   when: "{{ manage_roadmap }}"
   default: Release
   help: 本仓发布工作流的 name。GitHub Actions 发布完成后用它同步路线图。
+release_plan:
+  type: json
+  default: {}
+  help: 可选的独立发布配置。填写版本、产品类型、开发检查和真实下游验收。留空可沿用宿主已有的发布方式。
+  validator: "{% if release_plan and (release_plan.kind not in ['copier','binary'] or not release_plan.version or not release_plan.check or not release_plan.consumer) %}请填写 kind、version、check 和 consumer{% endif %}"

@@ -1,0 +1,67 @@
+name: Release
+on:
+  workflow_run:
+    workflows: ["Template"]
+    types: [completed]
+    branches: [dev, main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: release-${{ github.event.workflow_run.id || github.run_id }}
+  cancel-in-progress: false
+jobs:
+  source:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-24.04
+    outputs:
+      mode: ${{ steps.plan.outputs.mode }}
+      sha: ${{ steps.plan.outputs.sha }}
+      tag: ${{ steps.plan.outputs.tag }}
+      preview: ${{ steps.plan.outputs.preview }}
+      proof: ${{ steps.plan.outputs.proof }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install the Copier answers parser
+        if: true
+        run: python3 -m venv "$RUNNER_TEMP/release-python" && "$RUNNER_TEMP/release-python/bin/pip" install PyYAML==6.0.3
+      - id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [[ -x "$RUNNER_TEMP/release-python/bin/python" ]]; then
+            "$RUNNER_TEMP/release-python/bin/python" .github/release/plan.py
+          else
+            python3 .github/release/plan.py
+          fi
+  publish:
+    needs: source
+    if: >-
+      needs.source.result == 'success' && needs.source.outputs.mode != 'complete'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      actions: read
+    concurrency:
+      group: publish-${{ needs.source.outputs.tag }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify and publish the selected release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MODE: ${{ needs.source.outputs.mode }}
+          SOURCE_SHA: ${{ needs.source.outputs.sha }}
+          TAG: ${{ needs.source.outputs.tag }}
+          PREVIEW: ${{ needs.source.outputs.preview }}
+          PROOF: ${{ needs.source.outputs.proof }}
+          DIST: ${{ runner.temp }}/dist
+        run: python3 .github/release/publish.py

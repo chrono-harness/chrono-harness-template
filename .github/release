@@ -1,0 +1,1 @@
+../scaffold/.github/{% if release_plan %}release{% endif %}
