@@ -14,4 +14,4 @@
 
 ## 本仓验证
 
-本仓的模板选项在 `copier.yml`，生成文件在 `scaffold/`。从仓库根目录运行 `./check.sh`，使用 Copier 生成默认、空选和指定工具组合，再以 `check.py` 检查实际结果。
+模板选项在 `copier.yml`，生成宿主的文件在 `scaffold/`，模板自身的检查在 `tests/`。从仓库根目录运行 `./tests/check.sh` 验证生成结果、路线图和发布流程。

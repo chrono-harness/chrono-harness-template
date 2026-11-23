@@ -56,3 +56,7 @@ uvx --from copier==9.19.1 copier update --vcs-ref :current: --answers-file .chro
 dev 落地检查通过后，工作流以该次检查的运行号发布预览。下游采用并通过登记的实际验收后，在提供方 dev 上派发 Release 工作流；它核对双方提交、落地任务、步骤与公开预览，快进 main 并从同一 SHA 发布正式版。二进制正式版沿用已经验证的预览字节。发布新版本时在 dev 更新目标版本。
 
 Copier 源码产品可选 `version_policy: next_patch`。新提交在最高已公开正式版上递增补丁。需要次版本或主版本时，将仓内 `version` 提高到对应目标。路线图将新事项分配到同一版本里程碑。已经正式发布的提交或其祖先再次收到事件时直接结束。默认的 `explicit` 采用仓内版本，二进制产品沿用原生程序的版本声明。
+
+## 开发模板
+
+模板选项在 `copier.yml`，写入宿主的文件在 `scaffold/`。修改模板后，从仓库根目录运行 `./tests/check.sh`。

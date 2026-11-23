@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
-node --test roadmap.test.cjs
-PYTHONDONTWRITEBYTECODE=1 uv run --no-project --python ">=3.11" --with PyYAML==6.0.3 python test_release.py
+cd "$(dirname "$0")/.."
+node --test tests/roadmap.test.cjs
+PYTHONDONTWRITEBYTECODE=1 uv run --no-project --python ">=3.11" --with PyYAML==6.0.3 python tests/test_release.py
 stage=$(mktemp -d)
 trap 'rm -rf -- "$stage"' EXIT
 uvx --from copier==9.19.1 copier copy --defaults --vcs-ref HEAD -d repository=chrono-harness/chrono-harness-template "$PWD" "$stage/default"
@@ -28,7 +29,7 @@ for tool in diagnostics host-bootstrap host-release inputs judge-routes judge-co
   uvx --from copier==9.19.1 copier copy --defaults --vcs-ref HEAD \
     -d repository=chrono-harness/chrono-harness-template -d "features=[\"$tool\"]" . "$stage/$tool"
 done
-uv run --no-project --python ">=3.11" python check.py "$stage/empty" "$stage/selected" "$stage/default" "$stage/diagnostics" "$stage/host-bootstrap" "$stage/host-release" "$stage/inputs" "$stage/judge-routes" "$stage/judge-cost" "$stage/worktree" "$stage/judge-filemap" "$stage/judge-mixed" "$stage/judge-projects" "$stage/judge-ci" "$stage/judge-workflow" "$stage/test-git"
+uv run --no-project --python ">=3.11" python tests/check_render.py "$stage/empty" "$stage/selected" "$stage/default" "$stage/diagnostics" "$stage/host-bootstrap" "$stage/host-release" "$stage/inputs" "$stage/judge-routes" "$stage/judge-cost" "$stage/worktree" "$stage/judge-filemap" "$stage/judge-mixed" "$stage/judge-projects" "$stage/judge-ci" "$stage/judge-workflow" "$stage/test-git"
 
 # Exercise a real host that edits its guide and later changes its tool choices.
 (
