@@ -6,7 +6,7 @@ _answers_file: .chrono-harness/template-answers.yml
 features:
   type: str
   multiselect: true
-  help: 默认安装全部工具。按空格取消本仓不需要的工具，回车确认。
+  help: 默认安装全部工具。按空格取消本仓不需要的工具，回车确认。组件介绍见 https://github.com/chrono-harness/chrono-harness-main
   default: &available_tools
     - cache
     - ci
@@ -25,6 +25,7 @@ features:
     - judge-routes
     - judge-workflow
     - pr
+    - test-git
     - worktree
     - verus
   choices: *available_tools
