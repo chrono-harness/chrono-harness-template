@@ -50,7 +50,7 @@ for host, commands in [
     (release, {"chrono-host-release", "chrono-host-bootstrap", "chrono-judge-registration"}),
     (inputs, {"chrono-inputs", "chrono-judge-registration", "chrono-judge-routes", "chrono-judge-filemap", "chrono-judge-mixed"}),
     (workflow, {"chrono-judge-workflow", "chrono-judge-projects", "chrono-judge-routes", "chrono-judge-registration"}),
-    (projects, {"chrono-judge-projects", "chrono-judge-filemap"}),
+    (projects, {"chrono-judge-projects", "chrono-judge-filemap", "chrono-judge-routes"}),
     (judge_ci, {"chrono-judge-ci", "chrono-judge-projects", "chrono-judge-filemap", "chrono-judge-routes", "chrono-judge-mixed", "chrono-judge-registration"}),
     (mixed, {"chrono-judge-mixed", "chrono-judge-registration"}),
     (filemap, {"chrono-judge-filemap", "chrono-judge-mixed", "chrono-judge-registration"}),
