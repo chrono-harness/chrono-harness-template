@@ -1,5 +1,7 @@
 # {{ repository ~ ' 工具入口' if repository else '本仓工具入口' }}
 
+组件的用途、开发仓库和示例见 [Chrono Harness 用户与开发者入口](https://github.com/chrono-harness/chrono-harness-main)。
+
 开发分支为 `{{ dev_branch }}`。日常 PR 合入开发分支，正式版从 `main` 发布。
 {% if features or generate_check %}
 首次检出运行 `mise trust` 和 `mise run harness-setup`。工具版本见 [.config/mise/conf.d/chrono-harness.toml](../.config/mise/conf.d/chrono-harness.toml)。{% endif %}

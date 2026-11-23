@@ -1,5 +1,7 @@
 # chrono-harness-template 使用说明
 
+组件的用途、开发仓库和示例见 [Chrono Harness 用户与开发者入口](https://github.com/chrono-harness/chrono-harness-main)。
+
 本仓维护供独立仓库选装工具的 Copier 模板。
 
 开发分支为 `dev`。日常 PR 合入开发分支，正式版从 `main` 发布。
