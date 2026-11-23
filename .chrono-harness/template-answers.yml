@@ -28,3 +28,5 @@ project_guide: ''
 repository: chrono-harness/chrono-harness-template
 required_check: check
 
+manage_roadmap: true
+publisher_workflow: Release

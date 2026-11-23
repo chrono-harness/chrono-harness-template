@@ -38,3 +38,9 @@ uvx --from copier==9.19.1 copier update --vcs-ref :current: --answers-file .chro
 升级模板本身时，将 `:current:` 换为目标发行标签。Copier 将模板变更与本仓已提交的定制合并，重叠修改由本仓处理。审核生成的 diff 后提交。
 
 全部工具和业务检查都取消时，可以跳过 mise 步骤。选择记录位于 `.chrono-harness/template-answers.yml`，规则取舍归宿主的 `.chrono-harness/rules.json`。
+
+## Issue 与版本路线图
+
+模板默认启用 `manage_roadmap`。在仓库的 **Issues → Milestones** 查看本仓路线图。新建或重开的事项保留已有里程碑。未分配事项进入 `.chrono-harness/release.json` 的 `version` 所对应的里程碑（例如 `v0.1.0`）。尚未制定版本计划或该版本已经正式发布时，事项进入 `Backlog`。维护者可以随时调整单项归属。PR 的 `Closes #123` 由 GitHub 在合入默认分支时关闭对应事项。
+
+实际发布的测试版和正式版显示在对应版本的里程碑里。正式版公开且该里程碑开放事项为零时自动关闭。重开其中的事项会恢复里程碑。选择 `publisher_workflow` 时填写本仓发布工作流的名称，以接收 Actions 使用仓库令牌发布后的完成事件。手动运行 `Issue roadmap` 可从 GitHub 当前数据重算。工作流只在本仓读 Release 和写 Issues、Milestones。

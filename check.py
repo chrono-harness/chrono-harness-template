@@ -6,6 +6,10 @@ import tomllib
 
 empty, selected, full, diagnostics, bootstrap, release, inputs, routes, cost, worktree, filemap, mixed, projects, judge_ci, workflow, test_git = map(Path, sys.argv[1:])
 manifest = Path(".config/mise/conf.d/chrono-harness.toml")
+for path in (".github/roadmap.cjs", ".github/workflows/issue-roadmap.yml"):
+    assert not (empty / path).exists()
+    assert (full / path).read_bytes() == Path(path).read_bytes()
+
 assert not (empty / manifest).exists()
 config = tomllib.loads((selected / manifest).read_text())
 assert set(config["tools"]) == {"http:chrono-pr"}

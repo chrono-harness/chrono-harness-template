@@ -65,3 +65,12 @@ check_os:
   help: 业务检查在哪个平台执行？
   default: ubuntu-24.04
   choices: [ubuntu-24.04, macos-15]
+manage_roadmap:
+  type: bool
+  default: true
+  help: 使用本仓 GitHub Issues、Milestones 和公开发行自动维护版本路线图。
+publisher_workflow:
+  type: str
+  when: "{{ manage_roadmap }}"
+  default: Release
+  help: 本仓发布工作流的 name。GitHub Actions 发布完成后用它同步路线图。
