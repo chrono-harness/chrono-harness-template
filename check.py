@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 import tomllib
 
-empty, selected, full, bootstrap, release, inputs, routes, cost, worktree, filemap, mixed, projects, judge_ci = map(Path, sys.argv[1:])
+empty, selected, full, bootstrap, release, inputs, routes, cost, worktree, filemap, mixed, projects, judge_ci, workflow = map(Path, sys.argv[1:])
 manifest = Path(".config/mise/conf.d/chrono-harness.toml")
 assert not (empty / manifest).exists()
 config = tomllib.loads((selected / manifest).read_text())
@@ -49,6 +49,7 @@ for host, commands in [
     (bootstrap, {"chrono-host-bootstrap", "chrono-judge-registration"}),
     (release, {"chrono-host-release", "chrono-judge-registration"}),
     (inputs, {"chrono-inputs", "chrono-judge-registration", "chrono-judge-routes", "chrono-judge-filemap", "chrono-judge-mixed"}),
+    (workflow, {"chrono-judge-workflow", "chrono-judge-projects"}),
     (projects, {"chrono-judge-projects", "chrono-judge-filemap"}),
     (judge_ci, {"chrono-judge-ci", "chrono-judge-projects"}),
     (mixed, {"chrono-judge-mixed", "chrono-judge-registration"}),

@@ -1,6 +1,6 @@
 # chrono-harness 仓库模板
 
-在已有仓库的根目录运行 Copier。默认勾选全部 18 个 Chrono 命令和 Verus。用空格取消任意工具，也可以全部取消。工具从各自版本固定的发行下载，mise 按 SHA-256 校验，安装在工作树外。选中 Verus 会一并安装其依赖的 Rust 1.95.0。选中 worktree、host-bootstrap 或 host-release 时会一并安装它查询项目登记所需的 chrono-judge-registration。单选 judge-mixed 会安装 registration，用于原生判官协议。单选 judge-filemap 会安装 mixed，用于判定变更影响的测试。单选 inputs 会为 capture 安装 registration，并为带执行单元的 compose 安装 routes、FILEMAP 和 mixed。单选 judge-projects 会安装 FILEMAP，用于读取受影响的节点。单选 judge-ci 会安装 projects，用于核对 schema 2 项目的测试配对。单选 routes 只需随装 FILEMAP。单选 judge-cost 会安装 FILEMAP 和 registration。只生成工作流的仓库可以单选 ci。需要按变更调度执行单元或汇总其报告时，同时选择 ci 和 judge-ci。支持 Linux x86_64 和 macOS arm64。
+在已有仓库的根目录运行 Copier。默认勾选全部 18 个 Chrono 命令和 Verus。用空格取消任意工具，也可以全部取消。工具从各自版本固定的发行下载，mise 按 SHA-256 校验，安装在工作树外。选中 Verus 会一并安装其依赖的 Rust 1.95.0。选中 worktree、host-bootstrap 或 host-release 时会一并安装它查询项目登记所需的 chrono-judge-registration。单选 judge-mixed 会安装 registration，用于原生判官协议。单选 judge-filemap 会安装 mixed，用于判定变更影响的测试。单选 inputs 会为 capture 安装 registration，并为带执行单元的 compose 安装 routes、FILEMAP 和 mixed。单选 judge-projects 会安装 FILEMAP，用于读取受影响的节点。单选 judge-workflow 会安装 projects，用于核验执行结果和收集凭证。单选 judge-ci 会安装 projects，用于核对 schema 2 项目的测试配对。单选 routes 只需随装 FILEMAP。单选 judge-cost 会安装 FILEMAP 和 registration。只生成工作流的仓库可以单选 ci。需要按变更调度执行单元或汇总其报告时，同时选择 ci 和 judge-ci。支持 Linux x86_64 和 macOS arm64。
 
 ```sh
 uvx --from copier==9.19.1 copier copy --vcs-ref v0.1.0-alpha.19 gh:chrono-harness/chrono-harness-template .
