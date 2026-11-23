@@ -56,10 +56,10 @@ for host, commands in [
     (workflow, {"chrono-judge-workflow", "chrono-judge-projects", "chrono-judge-routes", "chrono-judge-registration"}),
     (projects, {"chrono-judge-projects", "chrono-judge-filemap", "chrono-judge-routes", "chrono-judge-registration"}),
     (judge_ci, {"chrono-judge-ci", "chrono-judge-projects", "chrono-judge-filemap", "chrono-judge-routes", "chrono-judge-mixed", "chrono-judge-registration"}),
-    (mixed, {"chrono-judge-mixed", "chrono-judge-registration"}),
+    (mixed, {"chrono-harness", "chrono-judge-mixed", "chrono-judge-registration"}),
     (filemap, {"chrono-judge-filemap", "chrono-judge-mixed", "chrono-judge-registration"}),
     (routes, {"chrono-judge-routes", "chrono-judge-filemap", "chrono-judge-registration"}),
-    (cost, {"chrono-judge-cost", "chrono-judge-filemap", "chrono-judge-registration"}),
+    (cost, {"chrono-harness", "chrono-judge-cost", "chrono-judge-filemap", "chrono-judge-registration"}),
 ]:
     assert (host / "AGENTS.md").read_text().splitlines()[0] == "# chrono-harness/chrono-harness-template 工作说明"
     assert (host / ".chrono-harness/USAGE.md").read_text().splitlines()[0] == "# chrono-harness/chrono-harness-template 工具入口"
