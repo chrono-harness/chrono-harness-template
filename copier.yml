@@ -45,9 +45,9 @@ check_command:
   validator: "{% if not check_command.strip() %}请输入业务检查命令{% endif %}"
 repository:
   type: str
-  when: "{{ 'pr' in features }}"
-  help: GitHub 仓库 owner/name
-  validator: "{% if not (repository | regex_search('^[A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9][A-Za-z0-9_.-]*$')) %}请输入 owner/name{% endif %}"
+  default: ""
+  help: GitHub 仓库 owner/name（选用 pr 时必填，其他仓库可以留空）
+  validator: "{% if ('pr' in features or repository) and not (repository | regex_search('^[A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9][A-Za-z0-9_.-]*$')) %}请输入 owner/name{% endif %}"
 dev_branch:
   type: str
   default: dev

@@ -1,4 +1,4 @@
-# 本仓工具入口
+# {{ repository ~ ' 工具入口' if repository else '本仓工具入口' }}
 
 开发分支为 `{{ dev_branch }}`。日常 PR 合入开发分支，正式版从 `main` 发布。
 {% if features or generate_check %}
