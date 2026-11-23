@@ -9,7 +9,7 @@ uvx --from copier==9.19.1 copier copy --defaults --vcs-ref HEAD \
   -d 'project_guide=业务源码位于 src/。' -d generate_check=true -d 'check_command=python3 check.py' . "$stage/selected"
 for tool in host-bootstrap host-release inputs judge-routes judge-cost worktree judge-filemap judge-mixed judge-projects judge-ci judge-workflow; do
   uvx --from copier==9.19.1 copier copy --defaults --vcs-ref HEAD \
-    -d "features=[\"$tool\"]" . "$stage/$tool"
+    -d repository=chrono-harness/chrono-harness-template -d "features=[\"$tool\"]" . "$stage/$tool"
 done
 uv run --no-project --python ">=3.11" python check.py "$stage/empty" "$stage/selected" "$stage/default" "$stage/host-bootstrap" "$stage/host-release" "$stage/inputs" "$stage/judge-routes" "$stage/judge-cost" "$stage/worktree" "$stage/judge-filemap" "$stage/judge-mixed" "$stage/judge-projects" "$stage/judge-ci" "$stage/judge-workflow"
 
