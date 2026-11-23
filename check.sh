@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
+node --test roadmap.test.cjs
 stage=$(mktemp -d)
 trap 'rm -rf -- "$stage"' EXIT
 uvx --from copier==9.19.1 copier copy --defaults --vcs-ref HEAD -d repository=chrono-harness/chrono-harness-template "$PWD" "$stage/default"
-uvx --from copier==9.19.1 copier copy --defaults --vcs-ref HEAD -d 'features=[]' . "$stage/empty"
+uvx --from copier==9.19.1 copier copy --defaults --vcs-ref HEAD -d 'features=[]' -d manage_roadmap=false . "$stage/empty"
 uvx --from copier==9.19.1 copier copy --defaults --vcs-ref HEAD \
   -d 'features=["pr"]' -d repository=chrono-harness/chrono-harness-template \
   -d 'project_guide=业务源码位于 src/。' -d generate_check=true -d 'check_command=python3 check.py' . "$stage/selected"

@@ -1,0 +1,35 @@
+name: Issue roadmap
+on:
+  issues:
+    types: [opened, reopened, closed, milestoned, demilestoned, deleted, transferred]
+  release:
+    types: [published]
+  workflow_run:
+    workflows: ["Release"]
+    types: [completed]
+  push:
+    branches: ["dev"]
+    paths: [.chrono-harness/release.json, .github/roadmap.cjs, .github/workflows/issue-roadmap.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: issue-roadmap
+  cancel-in-progress: false
+jobs:
+  reconcile:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+      - uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        with:
+          script: |
+            const fs = require('node:fs')
+            const file = '.chrono-harness/release.json'
+            const plan = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : null
+            await require('./.github/roadmap.cjs')(github, context, plan)
