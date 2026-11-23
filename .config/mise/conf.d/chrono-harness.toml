@@ -23,6 +23,7 @@ linux-x64 = { url = "https://github.com/chrono-harness/chrono-harness-diagnostic
 macos-arm64 = { url = "https://github.com/chrono-harness/chrono-harness-diagnostics/releases/download/v0.1.0-alpha.2/chrono-diagnostics-macos-aarch64", checksum = "sha256:668bf9f55e7625295c36d1c15c1b02a54a098623e5178c79071087712fda23aa" }
 
 
+
 [tools."http:chrono-distribution"]
 version = "0.1.0-alpha.1"
 bin = "chrono-distribution"
@@ -136,11 +137,11 @@ macos-arm64 = { url = "https://github.com/chrono-harness/chrono-harness-judge-wo
 
 
 [tools."http:chrono-pr"]
-version = "0.1.0-alpha.2"
+version = "0.1.0"
 bin = "chrono-pr"
 [tools."http:chrono-pr".platforms]
-linux-x64 = { url = "https://github.com/chrono-harness/chrono-harness-pr/releases/download/v0.1.0-alpha.2/chrono-pr-linux-x86_64", checksum = "sha256:fbec333dbbaf2e6fa602cc07b176e65a68da9e39cbb6b19ca72285da4eef03eb" }
-macos-arm64 = { url = "https://github.com/chrono-harness/chrono-harness-pr/releases/download/v0.1.0-alpha.2/chrono-pr-macos-aarch64", checksum = "sha256:f1be815938cb6f436cdb8c0171e0a5b6733e3e80c518b2d088e9e5682bc83992" }
+linux-x64 = { url = "https://github.com/chrono-harness/chrono-harness-pr/releases/download/v0.1.0/chrono-pr-linux-x86_64", checksum = "sha256:ac3b0bc0d013f0671586952235dedc3b3856c1002aafbfc465b86001eeae1db6" }
+macos-arm64 = { url = "https://github.com/chrono-harness/chrono-harness-pr/releases/download/v0.1.0/chrono-pr-macos-aarch64", checksum = "sha256:b3ba3099ac3d1af5c6d0347ff9f9bb0e568bbeb60ede6d0bd4a6a2279b75817f" }
 
 
 [tools."http:chrono-test-git"]
@@ -156,6 +157,7 @@ bin = "chrono-test-git-profile"
 [tools."http:chrono-test-git-profile".platforms]
 linux-x64 = { url = "https://github.com/chrono-harness/chrono-harness-test-git/releases/download/v0.1.0-alpha.2/chrono-test-git-profile-linux-x86_64", checksum = "sha256:9bc04372005be2f001a80ec5bc5f49ebf10d90a45a44f2bea8294fd2c29973e8" }
 macos-arm64 = { url = "https://github.com/chrono-harness/chrono-harness-test-git/releases/download/v0.1.0-alpha.2/chrono-test-git-profile-macos-aarch64", checksum = "sha256:6284a14776a07e1f8e5a65ab7d95cdf3134bd1374c0c8a13ade3c5638ad054a8" }
+
 
 [tools."http:chrono-worktree"]
 version = "0.1.0-alpha.3"
@@ -180,7 +182,9 @@ macos-arm64 = { url = "https://github.com/verus-lang/verus/releases/download/rel
 
 
 
-[tasks.harness-setup]
-description = "Install this repository's selected tools"
-run = ["mise install", "mise exec -- chrono-instructions sync-rules --host-root ."]
+[settings]
+disable_tools = []
 
+[tasks.harness-setup]
+description = "Install selected tools and prepare this checkout"
+run = ["mise install", "python3 .chrono-harness/setup.py"]

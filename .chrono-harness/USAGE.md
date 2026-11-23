@@ -1,17 +1,9 @@
-# chrono-harness-template 使用说明
+# 使用说明
 
-组件的用途、开发仓库和示例见 [Chrono Harness 用户与开发者入口](https://github.com/chrono-harness/chrono-harness-main)。
+在仓库根目录运行 `mise trust` 和 `mise run harness-setup`。安装清单为 `.config/mise/conf.d/chrono-harness.toml`。其中 `[settings].disable_tools` 默认为空。要取消某项工具，把对应的 mise 工具名加入这个数组并提交。例如 `disable_tools = ["http:chrono-cache"]`。再次运行 setup 后，mise 会按本仓选择工作。
 
-本仓维护供独立仓库选装工具的 Copier 模板。
+根 AGENTS.md 指向 CLAUDE.md。默认的 `.chrono-harness/rules.json` 采用 `{"mode":"all"}`，上游新增规则也会被采用。用 `{"mode":"all","exclude":["规则 ID"]}` 排除指定规则，或用 `{"mode":"only","include":["规则 ID"]}` 只采用所选规则。setup 会刷新根指南的规则正文，生成块之外可保留本仓指令。
 
-开发分支为 `dev`。日常 PR 合入开发分支，正式版从 `main` 发布。
+chrono-pr 的仓库和目标分支来自 origin。平台提供的事件或 Git 远端 HEAD 决定默认分支。PR 查询的必需检查与时限可在 `.chrono-harness/pr-policy.json` 配置。用 `mise exec -- chrono-pr pr-reminders` 查看工作树的本地提醒。
 
-首次检出运行 `mise trust` 和 `mise run harness-setup`。工具版本见 [.config/mise/conf.d/chrono-harness.toml](../.config/mise/conf.d/chrono-harness.toml)。
-
-开始任务时运行 `mise run harness-setup` 刷新根指南，成功后重新阅读本仓的 `AGENTS.md` 或 `CLAUDE.md`。完整规则和本仓开发步骤见根 [CLAUDE.md](../CLAUDE.md)。
-
-用 `mise exec -- chrono-pr pr-reminders` 查看本地提醒，再运行 `mise exec -- chrono-pr pr-status --pr NUMBER --head-sha SHA` 查询 GitHub。
-
-## 本仓验证
-
-模板选项在 `copier.yml`，生成宿主的文件在 `scaffold/`，模板自身的检查在 `tests/`。从仓库根目录运行 `./tests/check.sh` 验证生成结果、路线图和发布流程。
+新建 GitHub Issue 即可使用随仓路线图。默认的 Issue 和里程碑工作流跟随本仓默认分支；登记 `.chrono-harness/release.json` 的 `version` 后，路线图可按该版本归集事项。
