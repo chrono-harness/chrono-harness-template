@@ -64,3 +64,34 @@ test('new work, release publication, closing and reopening reconcile against cur
   assert.equal(target.state, 'open')
   await assert.rejects(run({version: 'not-a-version'}), /Expected version/)
 })
+
+test('a failed publication owns one issue and its successful retry closes it', async () => {
+  const run = {id: 123, name: 'Release', run_number: 9, run_attempt: 1,
+    html_url: 'https://github.com/a/b/actions/runs/123', status: 'completed', head_sha: 'abcdef', conclusion: 'failure'}
+  const items = [{number: 1, state: 'open', user: {login: 'somebody'}, body: '<!-- chrono-harness release-run 123 -->'}]
+  let hasLabel = false
+  const rest = {
+    actions: {getWorkflowRun: async ({run_id}) => {assert.equal(run_id, 123); return {data: run}}},
+    issues: {
+      listForRepo: () => items,
+      getLabel: () => {if (!hasLabel) throw Object.assign(new Error('missing label'), {status: 404})},
+      createLabel: () => {hasLabel = true},
+      create: data => {items.push({...data, number: 2, state: 'open', user: {login: 'github-actions[bot]'}})},
+      update: ({issue_number, ...fields}) => {Object.assign(items.find(i => i.number === issue_number), fields)},
+    },
+  }
+  const notify = () => sync.releaseIssue({rest, paginate: async fn => [...fn()]},
+    {repo: {owner: 'a', repo: 'b'}, payload: {workflow_run: {id: 123}}})
+  await notify()
+  await notify()
+  assert.equal(items.length, 2)
+  assert.equal(hasLabel, true)
+  assert.match(items[1].body, /attempts\/1/)
+  run.run_attempt = 2
+  run.conclusion = 'success'
+  await notify()
+  await notify()
+  assert.equal(items[1].state, 'closed')
+  assert.match(items[1].body, /attempts\/2/)
+  assert.equal(items[0].state, 'open')
+})
