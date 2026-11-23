@@ -86,6 +86,8 @@ release_plan:
         or p.consumer is not mapping or not p.consumer.repository or not p.consumer.branch or not p.consumer.workflow
         or not p.consumer.pin or not p.consumer.jobs or p.consumer.jobs is string or not p.consumer.step -%}
     请填写 kind、version、check 和完整的 consumer 验收配置
+    {%- elif p.version_policy | default("explicit") not in ["explicit", "next_patch"] or (p.version_policy | default("explicit") == "next_patch" and p.kind != "copier") -%}
+    next_patch 只适用于 Copier 源码发布
     {%- elif p.kind == "binary" and (not (p.binary | default("") | regex_search("^[A-Za-z0-9_-]+$"))
          or not (p.build | default("") | regex_search("^[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*$"))
          or ".." in p.build.split("/")) -%}

@@ -14,5 +14,6 @@
       "copier"
     ],
     "step": "Render the installed template and verify the selected host files"
-  }
+  },
+  "version_policy": "next_patch"
 }

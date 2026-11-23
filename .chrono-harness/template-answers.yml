@@ -30,4 +30,4 @@ required_check: check
 
 manage_roadmap: true
 publisher_workflow: Release
-release_plan: {"kind": "copier", "version": "0.1.0", "check": {"file": "template.yml", "name": "Template"}, "consumer": {"repository": "chrono-harness/chrono-harness-example", "branch": "dev", "workflow": "template-adoption.yml", "pin": ".chrono-harness/template-answers.yml", "jobs": ["copier"], "step": "Render the installed template and verify the selected host files"}}
+release_plan: {"kind": "copier", "version": "0.1.0", "check": {"file": "template.yml", "name": "Template"}, "consumer": {"repository": "chrono-harness/chrono-harness-example", "branch": "dev", "workflow": "template-adoption.yml", "pin": ".chrono-harness/template-answers.yml", "jobs": ["copier"], "step": "Render the installed template and verify the selected host files"}, "version_policy": "next_patch"}

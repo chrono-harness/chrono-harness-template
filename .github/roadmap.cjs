@@ -19,7 +19,22 @@ module.exports = async function syncRoadmap(github, context, plan) {
     milestones.push(data)
     return data
   }
-  const target = plan ? 'v' + plan.version : null
+  let target = plan ? 'v' + plan.version : null
+  if (plan?.version_policy === 'next_patch') {
+    if (plan.kind !== 'copier') throw new Error('next_patch requires a Copier source product')
+    const compare = (a, b) => {
+      for (let index = 0; index < 3; index++) {
+        if (a[index] !== b[index]) return a[index] > b[index] ? 1 : -1
+      }
+      return 0
+    }
+    const versions = [...stable.keys()].filter(tag => tag.startsWith('v') && coreVersion.test(tag.slice(1)))
+      .map(tag => tag.slice(1).split('.').map(BigInt)).sort(compare)
+    const latest = versions.at(-1)
+    if (latest && compare(latest, plan.version.split('.').map(BigInt)) >= 0) {
+      target = 'v' + [latest[0], latest[1], latest[2] + 1n].join('.')
+    }
+  }
   const next = target && !stable.has(target) ? target : 'Backlog'
   const unassigned = await all(issues.listForRepo, {state: 'open', milestone: 'none'})
   for (const issue of unassigned) {

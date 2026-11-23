@@ -96,8 +96,11 @@ def consumer_pin(config, repository, sha):
         require(answers["_src_path"] in ("gh:" + repository, "https://github.com/" + repository,
                 "https://github.com/" + repository + ".git"), "consumer uses another template")
         tag = answers["_commit"]
-        require(re.fullmatch("v" + re.escape(config["version"]) + r"-alpha\.[1-9][0-9]*", tag),
-                "consumer has not adopted this preview series")
+        if config.get("version_policy") == "next_patch":
+            pattern = "v" + CORE + r"(?:-alpha[.][1-9][0-9]*)?"
+        else:
+            pattern = "v" + re.escape(config["version"]) + r"-alpha[.][1-9][0-9]*"
+        require(re.fullmatch(pattern, tag), "consumer has not adopted this preview series")
         return tag, None
     import tomllib
     binary = config["binary"]
@@ -105,17 +108,70 @@ def consumer_pin(config, repository, sha):
     return pin_manifest(repository, binary, config["version"], tool)
 
 
+CORE = r"(0|[1-9][0-9]*)[.](0|[1-9][0-9]*)[.](0|[1-9][0-9]*)"
+
+
+def latest_source_release(repository):
+    stable = []
+    page = 1
+    while True:
+        releases = api(f"repos/{repository}/releases?per_page=100&page={page}")
+        for release in releases:
+            match = re.fullmatch("v" + CORE, release["tag_name"])
+            if match and release["published_at"] and not release["draft"] and not release["prerelease"]:
+                stable.append((tuple(map(int, match.groups())), release["tag_name"]))
+        if len(releases) < 100:
+            break
+        page += 1
+    if not stable:
+        return None
+    version, tag = max(stable)
+    sha = sha_of(repository, "tags/" + tag)
+    require(api(f"repos/{repository}/compare/{sha}...main")["status"] in ("identical", "ahead"),
+            "main does not contain the latest source release")
+    return version, tag, sha
+
+
+def next_target(config, repository):
+    policy = config.get("version_policy", "explicit")
+    require(policy in ("explicit", "next_patch"), "unsupported version policy")
+    if policy == "explicit":
+        return config, None
+    require(config["kind"] == "copier", "next_patch requires a Copier source product")
+    latest = latest_source_release(repository)
+    if latest is None:
+        return config, None
+    (major, minor, patch), _, _ = latest
+    target = max((major, minor, patch + 1), tuple(map(int, config["version"].split("."))))
+    return dict(config, version=".".join(map(str, target))), latest
+
+
+def already_released(repository, latest, sha):
+    if latest:
+        _, tag, released = latest
+        relation = api(f"repos/{repository}/compare/{released}...{sha}")["status"]
+        require(relation != "diverged", "candidate diverges from the latest stable release")
+        if relation in ("identical", "behind"):
+            return {"mode": "complete", "sha": released, "tag": tag}
+        require(relation == "ahead", "invalid release ancestry")
+    return None
+
+
 def plan(config, repository, event, event_name):
     require(config["kind"] in ("copier", "binary"), "unsupported release product")
     check_workflow = config["check"]["file"]
-    version = config["version"]
-    require(re.fullmatch(r"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)", version), "invalid release version")
+    require(re.fullmatch(CORE, config["version"]), "invalid release version")
     require(event["repository"]["full_name"] == repository, "wrong event repository")
+    config, latest = next_target(config, repository)
+    version = config["version"]
     if event_name == "workflow_run":
         run = event["workflow_run"]
         sha, branch = run["head_sha"], run["head_branch"]
         require(branch in ("dev", "main"), "unsupported release branch")
         check_run(run, repository, branch, check_workflow, sha)
+        completed = already_released(repository, latest, sha)
+        if completed:
+            return completed
         if branch == "dev":
             require(re.fullmatch(r"[a-f0-9]{40}", sha), "invalid source commit")
             relation = api(f"repos/{repository}/compare/{sha}...dev")["status"]
@@ -142,6 +198,9 @@ def plan(config, repository, event, event_name):
     check_acceptance(downstream, run, consumer)
     tag, checksums = consumer_pin(config, repository, adopted)
     selected = sha_of(repository, "tags/" + tag)
+    completed = already_released(repository, latest, selected)
+    if completed:
+        return completed
     require(sha is None or sha == selected, "main differs from the adopted preview")
     origin = successful_run(repository, "dev", check_workflow, selected)
     require(tag == f"v{version}-alpha.{origin['run_number']}", "tag differs from the verified dev run")
