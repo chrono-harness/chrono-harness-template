@@ -2,9 +2,14 @@ const childProcess = require('node:child_process')
 
 function judge(command, query) {
   const input = JSON.stringify(query)
+  const inputBytes = Buffer.byteLength(input)
+  // Selection can echo the release tag and its version, and adds two indices per title.
+  const maxBuffer = query.operation === 'release-selection'
+    ? 3 * inputBytes + 64 * query.milestones.length + 1024
+    : inputBytes + 1024
   const bytes = childProcess.execFileSync('chrono-host-release', [command], {
     input, encoding: 'utf8', stdio: ['pipe', 'pipe', 'inherit'],
-    maxBuffer: Buffer.byteLength(input) + 1024,
+    maxBuffer,
   })
   return JSON.parse(bytes)
 }
@@ -21,9 +26,6 @@ module.exports = async function syncRoadmap(github, context, plan) {
   const issues = github.rest.issues
   const all = (method, parameters) => github.paginate(method, {...repo, per_page: 100, ...parameters})
   const releases = await all(github.rest.repos.listReleases, {})
-  const published = roadmap({operation: 'published', releases: releases.map(({draft, published_at}) => ({draft, published_at}))})
-    .map(index => releases[index])
-  const stable = new Map(published.filter(r => !r.prerelease).map(r => [r.tag_name, r]))
   const milestones = await all(issues.listMilestones, {state: 'all'})
 
   async function ensure(title) {
@@ -33,16 +35,24 @@ module.exports = async function syncRoadmap(github, context, plan) {
     milestones.push(data)
     return data
   }
+  const releasesForPlan = releases.map(({tag_name, draft, prerelease, published_at}) =>
+    ({tag_name, draft, prerelease, published_at}))
   let target = plan ? 'v' + plan.version : null
   if (plan?.version_policy === 'next_patch') {
     if (plan.kind !== 'copier') throw new Error('next_patch requires a Copier source product')
-    const latest = judge('template-latest-stable-v1', releases.map(
-      ({tag_name, draft, prerelease, published_at}) => ({tag_name, draft, prerelease, published_at})))
+    const latest = judge('template-latest-stable-v1', releasesForPlan)
     target = 'v' + judge('template-next-version-v1', {
       floor: plan.version, latest: latest === null ? null : latest.slice(1),
     })
   }
-  const next = target && !stable.has(target) ? target : 'Backlog'
+  const titles = new Set(milestones.map(m => m.title))
+  if (target) titles.add(target)
+  const releaseEvent = context.payload.release?.tag_name
+  const selection = roadmap({
+    operation: 'release-selection', releases: releasesForPlan,
+    event_tag: releaseEvent, milestones: [...titles],
+  })
+  const next = target && selection.milestones[target].final === null ? target : 'Backlog'
   const unassigned = await all(issues.listForRepo, {state: 'open', milestone: 'none'})
   const numbers = roadmap({operation: 'unassigned',
     issues: unassigned.map(({number, state, pull_request, milestone}) => ({number, state, pull_request, milestone}))})
@@ -52,9 +62,7 @@ module.exports = async function syncRoadmap(github, context, plan) {
   }
   // Publishers using GITHUB_TOKEN wake this workflow via workflow_run.
   // Use the newest public release even when this host has no version plan.
-  const newest = published.slice().sort((a, b) => b.published_at.localeCompare(a.published_at))[0]
-  const tag = context.payload.release?.tag_name || newest?.tag_name
-  const releasedVersion = tag?.split('-')[0]
+  const releasedVersion = selection.tag?.split('-')[0]
   if (target) await ensure(target)
   if (releasedVersion?.startsWith('v') && coreVersion.test(releasedVersion.slice(1))) {
     await ensure(releasedVersion)
@@ -62,9 +70,9 @@ module.exports = async function syncRoadmap(github, context, plan) {
 
   for (const known of milestones) {
     if (!known.title.startsWith('v') || !coreVersion.test(known.title.slice(1))) continue
-    const final = stable.get(known.title)
-    const preview = published.filter(r => r.prerelease && r.tag_name.startsWith(known.title + '-'))
-      .sort((a,b) => b.published_at.localeCompare(a.published_at))[0]
+    const indices = selection.milestones[known.title]
+    const final = releases[indices.final]
+    const preview = releases[indices.preview]
     if (!final && !preview) continue
     const {data: milestone} = await issues.getMilestone({...repo, milestone_number: known.number})
     const lines = []
