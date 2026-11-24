@@ -67,22 +67,11 @@ module.exports = async function syncRoadmap(github, context, plan) {
       .sort((a,b) => b.published_at.localeCompare(a.published_at))[0]
     if (!final && !preview) continue
     const {data: milestone} = await issues.getMilestone({...repo, milestone_number: known.number})
-    const begin = '<!-- chrono-harness release -->'
-    const end = '<!-- /chrono-harness release -->'
-    const lines = [begin]
+    const lines = []
     if (preview) lines.push(`测试版 [${preview.tag_name}](${preview.html_url})`)
     if (final) lines.push(`正式版 [${final.tag_name}](${final.html_url})`)
-    lines.push(end)
-    const block = lines.join('\n')
     const original = milestone.description || ''
-    const start = original.indexOf(begin)
-    const stop = original.indexOf(end)
-    if ((start < 0) !== (stop < 0) || (start >= 0 && stop < start)) {
-      throw new Error('Incomplete release block in milestone ' + milestone.number)
-    }
-    const description = start >= 0
-      ? original.slice(0, start) + block + original.slice(stop + end.length)
-      : [original, block].filter(Boolean).join('\n\n')
+    const description = roadmap({operation: 'release-block', milestone: milestone.number, original, lines})
     const state = roadmap({operation: 'milestone', final_release: Boolean(final), open_issues: milestone.open_issues})
     if (description !== original || state !== milestone.state) {
       await issues.updateMilestone({...repo, milestone_number: known.number, description, state})
