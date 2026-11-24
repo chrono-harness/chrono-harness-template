@@ -1,13 +1,15 @@
 const childProcess = require('node:child_process')
 
-function roadmap(query) {
+function judge(command, query) {
   const input = JSON.stringify(query)
-  const bytes = childProcess.execFileSync('chrono-host-release', ['roadmap-v1'], {
+  const bytes = childProcess.execFileSync('chrono-host-release', [command], {
     input, encoding: 'utf8', stdio: ['pipe', 'pipe', 'inherit'],
     maxBuffer: Buffer.byteLength(input) + 1024,
   })
   return JSON.parse(bytes)
 }
+
+const roadmap = query => judge('roadmap-v1', query)
 
 const coreVersion = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
 
@@ -43,9 +45,9 @@ module.exports = async function syncRoadmap(github, context, plan) {
     const versions = [...stable.keys()].filter(tag => tag.startsWith('v') && coreVersion.test(tag.slice(1)))
       .map(tag => tag.slice(1).split('.').map(BigInt)).sort(compare)
     const latest = versions.at(-1)
-    if (latest && compare(latest, plan.version.split('.').map(BigInt)) >= 0) {
-      target = 'v' + [latest[0], latest[1], latest[2] + 1n].join('.')
-    }
+    target = 'v' + judge('template-next-version-v1', {
+      floor: plan.version, latest: latest ? latest.join('.') : null,
+    })
   }
   const next = target && !stable.has(target) ? target : 'Backlog'
   const unassigned = await all(issues.listForRepo, {state: 'open', milestone: 'none'})
