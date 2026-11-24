@@ -119,13 +119,17 @@
 
 ## collaboration.github-agent-identity
 
-在 GitHub 上标明发言的 agent 和会话。创建 Issue、PR、其评论和评审时，在正文后空一行，将下列格式作为最后一个非空行。以实际值替换尖括号占位符，使用固定字段顺序及单个 ASCII 空格，页脚为可见纯文本。
+在 GitHub 的 Issue、PR、评论和评审中发布可读的工作事件。每条新正文只在末尾追加一条事件。先写给人看的具体动作、原因或结果，空一行，然后用真实值填写以下单行格式。字段顺序、大小写和单个 ASCII 空格固定。独立事件也可单独成文。已有历史正文保留原样。
 
-Chrono-Agent-v1: agent=<agent> session=<session> parent=<parent>
+~~~text
+CHRONO_AGENT_BEGIN_082981f29eb429599bac65802d2f5465 v=2 agent=<agent> session=<session> parent=<parent> task=<task> event=<event> action=<action> state=<state> target=<target> CHRONO_AGENT_END_94f7082e08249c1b16af162e9625946a
+~~~
 
-agent 写实际运行时和层级任务路径，例如 codex/root/routes。用 / 分隔至少两段，每段符合 [a-z0-9][a-z0-9_-]*。会话首次使用时生成一个专供公开署名的小写随机 UUIDv4。同一会话继续工作或重试时复用该值；新会话或 fork 各自生成新值。直接委派者在派发时传递自己的公开 UUID，子会话把收到的真实直接父 UUID 写入 parent，用不同于自身的 UUID。根会话写 -。公开身份只使用这些专用值，私有运行时 ID、令牌和凭证留在本地。
+agent 写实际运行时和任务路径，至少两段，每段符合 [a-z0-9][a-z0-9_-]*。session 是会话首次建立时随机生成的公开小写 UUIDv4，同会话的重试复用；fork 新建 session 并接收直接父会话的公开 UUID，根写 parent=-。task 是同一实际任务沿用的公开随机 UUIDv4，父子共同工作时传递它。另行委派的独立任务新建 task，其委派事件可用 target=task/<新任务 UUID>。event 每个新动作或状态变化生成独立的公开随机 UUIDv4；传输重送复用原事件和相同字段。UUID 必须为小写标准形式、版本 4、变体 8/9/a/b。session、parent、task 和 event 的 UUID 两两不同。只使用这些公开专用 ID。
 
-GitHub 显示的账号是作者，页脚是 agent 对路径和会话的自报。授权依据 GitHub 权限及独立校验。编辑已有正文时保留原作者的页脚；其他会话另发带自身页脚的评论。识别时只接受一个满足上述要求的正文末尾署名。跳过 Markdown 引用、代码围栏和行内代码里的示例。缺失、格式错误或出现多个候选署名时记录 unknown，历史内容同样处理。
+action 取 task、delegate、issue、pr、review、push、ci.wait、check、build、test、release 之一。state 取 started、waiting、progress、blocked、succeeded、failed、cancelled 之一。target 取 self（本条正文所在的 GitHub 对象，适合编号未分配时）、task/<UUIDv4>、owner/repo#正整数、owner/repo@完整小写 Git OID（40 或 64 位）、owner/repo/run/正整数（可接 /attempt/正整数）或 owner/repo/tag/ASCII标签。开始、等待、解除阻塞、进展和结束时记录真实发生的转换，沿用同一 task、以不同 event 区分。等待完成通知时只发一次 waiting。成功/失败/取消结束该动作；新试验用新的事件陈述重试。保留乱序到达的每条观察，按 GitHub 原对象及创建时间组织，不以最后到达推断状态。相同 event 及内容只计一次，相同 event 内容冲突记为未知。
+
+使用 chrono-instructions event-format 从标准输入 JSON 生成页脚，event-read 从 GitHub API 原始正文读取八字段 JSON，event-regex 输出可复制的 ASCII 整行正则。读取要求唯一顶层普通段落，引用、嵌套代码、HTML 示例不参与；允许 LF 或 CRLF 和一个可选末尾换行。缺失、错误、多条或未知版本记为未知。GitHub 的作者账号与事件自报身份分别记录。完整行原样复制仍可被接受，高熵界标和正则都不能认证人或证明所述动作已发生。
 
 ## candidate.landing
 
