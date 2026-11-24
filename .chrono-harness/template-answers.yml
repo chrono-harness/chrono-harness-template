@@ -1,4 +1,4 @@
-_commit: v0.1.21
+_commit: v0.1.22
 _src_path: gh:chrono-harness/chrono-harness-copier
 dev_branch: ''
 features:
@@ -24,6 +24,7 @@ features:
 - worktree
 - verus
 generate_check: false
+github_templates: true
 manage_roadmap: true
 project_guide: ''
 publisher_workflow: Release
