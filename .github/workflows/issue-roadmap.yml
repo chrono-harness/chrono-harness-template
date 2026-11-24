@@ -34,8 +34,8 @@ jobs:
         run: |
           set -euo pipefail
           directory=$(mktemp -d "$RUNNER_TEMP/release-tool.XXXXXXXX")
-          curl --fail --silent --show-error --location "https://github.com/chrono-harness/chrono-harness-host-release/releases/download/v0.1.0-alpha.9/chrono-host-release-linux-x86_64" -o "$directory/chrono-host-release"
-          (cd "$directory" && echo "1eea315204041feaa0ece605bef4c250ac693a76cc9fe1b4a1a8b1b64c04659b  chrono-host-release" | sha256sum --check --status)
+          curl --fail --silent --show-error --location "https://github.com/chrono-harness/chrono-harness-host-release/releases/download/v0.1.0-alpha.14/chrono-host-release-linux-x86_64" -o "$directory/chrono-host-release"
+          (cd "$directory" && echo "b07a293f265e6c90cb1d0eb8b91016f1126dd4b2301b2e97239f06a5b00d009e  chrono-host-release" | sha256sum --check --status)
           chmod 755 "$directory/chrono-host-release"
           echo "$directory" >> "$GITHUB_PATH"
 
@@ -61,8 +61,8 @@ jobs:
         run: |
           set -euo pipefail
           directory=$(mktemp -d "$RUNNER_TEMP/release-tool.XXXXXXXX")
-          curl --fail --silent --show-error --location "https://github.com/chrono-harness/chrono-harness-host-release/releases/download/v0.1.0-alpha.9/chrono-host-release-linux-x86_64" -o "$directory/chrono-host-release"
-          (cd "$directory" && echo "1eea315204041feaa0ece605bef4c250ac693a76cc9fe1b4a1a8b1b64c04659b  chrono-host-release" | sha256sum --check --status)
+          curl --fail --silent --show-error --location "https://github.com/chrono-harness/chrono-harness-host-release/releases/download/v0.1.0-alpha.14/chrono-host-release-linux-x86_64" -o "$directory/chrono-host-release"
+          (cd "$directory" && echo "b07a293f265e6c90cb1d0eb8b91016f1126dd4b2301b2e97239f06a5b00d009e  chrono-host-release" | sha256sum --check --status)
           chmod 755 "$directory/chrono-host-release"
           echo "$directory" >> "$GITHUB_PATH"
 
