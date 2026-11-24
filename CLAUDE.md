@@ -6,6 +6,8 @@
 
 默认接纳上游所有规则。宿主可以在 `.chrono-harness/rules.json` 逐条设置 include 或 exclude，把本项目的职责、工作步骤和验证命令写在生成块外。工具选装与路线图见 [.chrono-harness/USAGE.md](.chrono-harness/USAGE.md)。规则的来源与许可见[来源说明](.chrono-harness/licenses/methodology-attribution.md)和[Apache-2.0](.chrono-harness/licenses/trureturing-Apache-2.0.txt)。
 
+提交 Issue、命名分支和交付 PR 时，遵循[协作规范](https://github.com/chrono-harness/chrono-harness-main/blob/dev/docs/contributing.md)。
+
 <!-- chrono-instructions:begin -->
 本文件由登记规则生成。请修改登记源后重新生成，不要单独编辑本文件。生成成功不代表规则已被遵守或检查已执行。
 
