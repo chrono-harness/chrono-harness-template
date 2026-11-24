@@ -17,12 +17,16 @@ else
 fi
 
 if command -v sha256sum >/dev/null 2>&1; then
-    actual=$(sha256sum < "$executable")
+    set -- sha256sum -c -
 else
-    actual=$(shasum -a 256 < "$executable")
+    set -- shasum -a 256 -c -
 fi
-if [ "$checksum" != "sha256:${actual%% *}" ]; then
+# Decode one complete mise pin. The check record names only our open input.
+if digest=$(LC_ALL=C expr "$checksum" : 'sha256:\([0-9a-f]\{64\}\)$') &&
+    printf '%s  /dev/fd/3\n' "$digest" | "$@" 3< "$executable" >/dev/null
+then
+    "$executable" prepare-template
+else
     echo 'template setup executable checksum differs from the mise pin' >&2
     exit 2
 fi
-"$executable" prepare-template
