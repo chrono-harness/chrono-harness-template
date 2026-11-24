@@ -189,4 +189,4 @@ disable_tools = []
 
 [tasks.harness-setup]
 description = "Install selected tools and prepare this checkout"
-run = ["mise install", "sh .chrono-harness/setup.sh"]
+run = ["mise install", "sh .chrono-harness/setup.sh {{ os() }}-{{ arch() }}"]
