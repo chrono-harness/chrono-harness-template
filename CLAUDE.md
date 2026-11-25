@@ -2,7 +2,24 @@
 
 从仓库根目录运行 `mise trust` 和 `mise run harness-setup` 安装工具、绑定当前 GitHub 仓库和默认分支，并刷新下方的基础规则。成功后重新阅读本文件。开发入口与组件用途见 [Chrono Harness](https://github.com/chrono-harness/chrono-harness-main)。
 
-开始和结束任务时，使用 `mise exec -- chrono-pr pr-reminders` 查看工作树的 PR 提醒。使用 `mise exec -- chrono-pr pr-status --pr NUMBER --head-sha SHA` 查询固定提交。
+首次检出时，在仓库根目录安装本仓选定的工具。
+
+```sh
+mise trust
+mise run harness-setup
+```
+
+
+本仓选装的工具为 `cache`、`ci`、`diagnostics`、`distribution`、`harness`、`host-bootstrap`、`host-release`、`inputs`、`instructions`、`judge-ci`、`judge-cost`、`judge-filemap`、`judge-mixed`、`judge-projects`、`registration`、`judge-routes`、`judge-workflow`、`pr`、`test-git`、`worktree`、`verus`。
+
+本仓安装选择保存在 `.chrono-harness/template-answers.yml`，版本和平台校验值保存在 `.config/mise/conf.d/chrono-harness.toml`。
+
+
+
+本仓使用自己的源码和业务检查。接入已有项目时，在本文件的生成块外写明项目职责、源码位置和本地验证命令。
+
+
+开始和结束任务时，用 `mise exec -- chrono-pr pr-reminders` 查看本工作树中自己打开的 PR。用 `mise exec -- chrono-pr pr-status --pr NUMBER --head-sha SHA` 核对指定候选。
 
 默认接纳上游所有规则。宿主可以在 `.chrono-harness/rules.json` 逐条设置 include 或 exclude，把本项目的职责、工作步骤和验证命令写在生成块外。工具选装与路线图见 [.chrono-harness/USAGE.md](.chrono-harness/USAGE.md)。规则的来源与许可见[来源说明](.chrono-harness/licenses/methodology-attribution.md)和[Apache-2.0](.chrono-harness/licenses/trureturing-Apache-2.0.txt)。
 
