@@ -20,3 +20,5 @@ chrono-pr 的仓库和目标分支来自 origin。平台提供的事件或 Git �
 ```sh
 uvx --from copier==9.19.1 copier update --defaults --vcs-ref :current: --answers-file .chrono-harness/template-answers.yml -d local_check_retention=true
 ```
+
+若最后一次成功的本地完整检查报告也应到期，在同一条命令加上 `-d 'expire_local_check_slots=[".chrono-harness/state/collection/check.json"]'`，将示例路径换成本仓登记的实际报告路径。默认列表为空。需要长期使用的结果应在窗口内转入持久存储。
