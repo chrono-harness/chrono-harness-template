@@ -6,7 +6,7 @@
 
 首次准备宿主使用 Git、mise 和系统命令。模板会从 origin 识别 GitHub 仓库及其默认分支，再用本次核验过的 `chrono-host-bootstrap` 执行 `prepare-template`。若用户禁用该工具，首次准备仍会从随附配方临时安装一份，校验摘要并在用完后删除。
 
-根 [CLAUDE.md](../CLAUDE.md) 包含本仓接纳的基础指令全文。规则选择在 `.chrono-harness/rules.json`。开始任务时运行 `mise run harness-setup` 刷新根指南，成功后重新阅读本仓的 `AGENTS.md` 或 `CLAUDE.md`。仓库追加说明见根 `CLAUDE.md`。
+本仓默认接纳全部上游规则，可在 `.chrono-harness/rules.json` 按 ID 选择。安装后即可从根 [CLAUDE.md](../CLAUDE.md) 阅读本仓选中的规则与追加说明。
 
 用 `mise exec -- chrono-pr pr-reminders` 查看本地提醒，再运行 `mise exec -- chrono-pr pr-status --pr NUMBER --head-sha SHA` 查询 GitHub。
 

@@ -1,29 +1,15 @@
 # 仓库工作说明
 
-从仓库根目录运行 `mise trust` 和 `mise run harness-setup` 安装工具、绑定当前 GitHub 仓库和默认分支，并刷新下方的基础规则。成功后重新阅读本文件。开发入口与组件用途见 [Chrono Harness](https://github.com/chrono-harness/chrono-harness-main)。
-
-首次检出时，在仓库根目录安装本仓选定的工具。
+首次检出时，在仓库根目录安装选中的工具并绑定当前 GitHub 仓库与默认分支。
 
 ```sh
 mise trust
 mise run harness-setup
 ```
 
+安装选项在 `.chrono-harness/template-answers.yml`，当前工具版本用 `mise current` 查看。下方是本仓已接纳的基础规则全文，选择文件为 `.chrono-harness/rules.json`。工具选装和 PR 查询命令见[使用说明](.chrono-harness/USAGE.md)。
 
-本仓选装的工具为 `cache`、`ci`、`diagnostics`、`distribution`、`harness`、`host-bootstrap`、`host-release`、`inputs`、`instructions`、`judge-ci`、`judge-cost`、`judge-filemap`、`judge-mixed`、`judge-projects`、`registration`、`judge-routes`、`judge-workflow`、`pr`、`test-git`、`worktree`、`verus`。
-
-本仓安装选择保存在 `.chrono-harness/template-answers.yml`，版本和平台校验值保存在 `.config/mise/conf.d/chrono-harness.toml`。
-
-
-
-本仓使用自己的源码和业务检查。接入已有项目时，在本文件的生成块外写明项目职责、源码位置和本地验证命令。
-
-
-开始和结束任务时，用 `mise exec -- chrono-pr pr-reminders` 查看本工作树中自己打开的 PR。用 `mise exec -- chrono-pr pr-status --pr NUMBER --head-sha SHA` 核对指定候选。
-
-默认接纳上游所有规则。宿主可以在 `.chrono-harness/rules.json` 逐条设置 include 或 exclude，把本项目的职责、工作步骤和验证命令写在生成块外。工具选装与路线图见 [.chrono-harness/USAGE.md](.chrono-harness/USAGE.md)。规则的来源与许可见[来源说明](.chrono-harness/licenses/methodology-attribution.md)和[Apache-2.0](.chrono-harness/licenses/trureturing-Apache-2.0.txt)。
-
-提交 Issue、命名分支和交付 PR 时，遵循[协作规范](https://github.com/chrono-harness/chrono-harness-main/blob/dev/docs/contributing.md)。
+接入业务项目时，在本文件末尾的「本仓追加指令」填写项目职责、源码位置和验证命令。[组件与开发入口](https://github.com/chrono-harness/chrono-harness-main) · [规则来源与许可](.chrono-harness/licenses/methodology-attribution.md) · [Apache-2.0](.chrono-harness/licenses/trureturing-Apache-2.0.txt)
 
 <!-- chrono-instructions:begin -->
 本文件由登记规则生成。请修改登记源后重新生成，不要单独编辑本文件。生成成功不代表规则已被遵守或检查已执行。
@@ -75,6 +61,8 @@ mise run harness-setup
 ## owner.canonical
 
 在真正负责的位置重构。定义、状态、输出和操作各自应有唯一权威来源和实际产生者。审查证实职责归属或耦合有问题时，先在那里重构，移除已经确认的冗余，再扩展；没有问题就不强制重构。局部改动应只需了解自身输入、接口和明确依赖。链接与别名要登记并指向真正来源。历史交给版本库；叙述和来源说明不能反过来决定程序依赖，也不能成为运行时权威。
+
+采用共享 AI 指令时，同一跨仓规则在相应指令库按 ID 维护。模板分发由所选规则生成的首读指南，宿主声明选择、工具、登记入口和独有约束。宿主启用了规则同步时，按该宿主登记的入口刷新指令，再读取生效的根指南。
 
 ## core.small-projects
 
@@ -156,15 +144,17 @@ action 取 task、delegate、issue、pr、review、push、ci.wait、check、buil
 
 ## collaboration.github-contribution
 
-普通 Issue 按主要诉求选择一个主标签：缺陷用 `bug`，功能或改进用 `enhancement`，文档用 `documentation`，问题用 `question`。发布失败沿用专用 `release-failure`。分支从 `dev` 创建，选 `feature/` 或 `integration/`，后接英文小写连字符短语；有本仓 Issue 时在短语前加编号和连字符。日常 PR 以 `dev` 为目标，正式版使用 `main`。PR 标题采用 `type(scope): 结果`，正文用 `Refs #编号` 关联工作，合入默认分支即可满足全部验收时用 `Closes #编号`；仍需发布、落地 CI 或下游采用时用 `Refs`，取得证据后关闭。跨仓引用写完整仓库名和编号。
+Issue 分类、工作分支命名、PR 标题、关联与关闭时机遵循本规则的完整说明。先读取负责仓登记的目标分支、标签、检查和交付要求。宿主可按本规则 ID 独立选择；工作事件另由 collaboration.github-agent-identity 定义。
 
-[组织协作规范](https://github.com/chrono-harness/chrono-harness-main/blob/dev/docs/contributing.md)
+[GitHub 贡献约定](https://github.com/chrono-harness/chrono-harness-instructions/blob/dev/docs/contributing.md)
 
 ## candidate.landing
 
 小步完成交付，并确认实际落地。限制同时进行的工作，及时解决阻碍、合并符合验收的变更，不积压未交付 PR。按实际合并、发布和已验收范围报告进度。合并或发布后，要核对实际状态、落地 SHA、产物和必要的后续检查；提交、创建 PR、检查通过或状态为 CLOSED，都不能单独证明已交付。受验候选与落地树不同时，说明差异并核对受影响范围。生命周期由调用方负责时，要明确交接边界，不能把阶段完成说成已经交付。
 
 宿主默认并行验收、按依赖合并。独立 PR 不按编号或创建顺序排队，也不因目标分支单纯前移而强制追平、重建或重跑全部检查。GitHub 默认关闭 strict（要求分支追平），保留必需的汇总检查；PR 各作业检查同一个固定合并提交，以第一父提交为基线，并核对第二父提交是事件 head。目标分支 push 按完整 before／after 检查实际落地变化，不取消彼此独立的落地运行。真实冲突、有效输入或明确依赖变化时补验受影响范围；检查后并发合入产生的新树由落地检查检测并及时修复。这个默认方案不保证检查时与落地时严格同树；有此要求的发布或不可逆操作须另有明确、已验证的合并执行方案，不能把串行追平当成默认。
+
+宿主已采用可查询的 PR 提醒时，在开始任务和结束或交接前，通过登记入口查看自己尚未完成的 PR，按实际关联继续跟进或交接。
 
 ## artifact.results
 
