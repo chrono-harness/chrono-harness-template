@@ -6,20 +6,21 @@ key="tools.\"http:chrono-host-bootstrap\".platforms.${1:?missing mise platform}.
 scratch=$(mktemp -d /tmp/chrono-template.XXXXXXXX)
 trap 'rm -rf -- "$scratch"' EXIT
 trap 'exit 1' HUP INT TERM
-manifest=.config/mise/conf.d/zz-chrono-harness-resolved.toml
 disabled=$(mise settings get disable_tools)
 case "$disabled" in
     *'"http:chrono-host-bootstrap"'*|*'"chrono-host-bootstrap"'*)
         # Prepare a new checkout even when bootstrap is disabled for everyday use.
-        cp .chrono-harness/pinned-tools.toml "$scratch/mise.toml"
-        manifest="$scratch/mise.toml"
+        cp .config/mise/conf.d/chrono-harness.toml "$scratch/mise.toml"
+        mise config get --file "$scratch/mise.toml" "$key" > "$scratch/pin"
         MISE_TRUSTED_CONFIG_PATHS="$scratch${MISE_TRUSTED_CONFIG_PATHS:+:$MISE_TRUSTED_CONFIG_PATHS}" \
             MISE_DISABLE_TOOLS= mise -C "$scratch" install-into http:chrono-host-bootstrap "$scratch/once"
         executable="$scratch/once/chrono-host-bootstrap"
         ;;
-    *) executable=$(mise which chrono-host-bootstrap) ;;
+    *)
+        mise config get "$key" > "$scratch/pin"
+        executable=$(mise which chrono-host-bootstrap)
+        ;;
 esac
-mise config get --file "$manifest" "$key" > "$scratch/pin"
 
 if command -v sha256sum >/dev/null 2>&1; then
     digest_record=$(sha256sum < "$executable")

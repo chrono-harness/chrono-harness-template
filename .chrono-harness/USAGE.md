@@ -1,8 +1,10 @@
 # 使用说明
 
-在仓库根目录运行 `mise trust` 和 `mise run harness-setup`。每次在 `dev`、`feature/*` 和 `integration/*` 安装，都会重新查询所选工具的公开 GitHub Releases，按 GitHub 的公开发布时间选择最新测试版，并校验当前平台二进制的 SHA-256。缓存命中也要校验。查询或校验失败，安装命令会报错。在本轮开发通道试用中，`main` 的首次安装和重装使用模板随附的固定版本。Rust 和 Verus 按模板登记的配套版本安装。
+在仓库根目录运行 `mise trust` 和 `mise run harness-setup`。绿色模板默认在每次安装时为所选工具查询 GitHub Releases，按公开发布时间选择最新测试版，并校验当前平台的 SHA-256。安装通道适用于任意分支与直接检出的提交。Rust 和 Verus 使用模板登记的配套版本。
 
-安装完成后，运行 `mise current` 查看本次选中的版本，日常用 `mise exec -- <命令>`。本地解析结果由 Git 忽略。要停用某个工具，在 `.config/mise/conf.d/chrono-harness.toml` 的 `[settings]` 中设置例如 `disable_tools = ["http:chrono-cache"]`，然后重新运行安装。要为集成分支选定个别版本，用 Copier 的 `integration_tool_tags` 选项，例如 `{"integration/pr-trial":{"chrono-pr":"v0.1.11"}}`。手动检出到提交时，可用 `CHRONO_INSTALL_BRANCH=dev mise run harness-setup` 指定安装所用的分支策略。
+用 `CHRONO_TOOL_CHANNEL=stable mise run harness-setup` 只在本次选择最新正式版。`preview` 选择最新测试版，也可填完整标签，如 `v0.1.12`。每个选中的组织工具都需要提供对应发行。安装后用 `mise current` 查看实际版本，日常用 `mise exec -- <命令>`。
+
+在 Copier 的 `tool_install_channels` 中保存项目默认通道。可选 `pinned` 使用 [.config/mise/conf.d/chrono-harness.toml](../.config/mise/conf.d/chrono-harness.toml) 中固定的配方，也可选 `stable`、`preview` 或完整标签。`tool_versions` 可以为单个命令指定精确标签，例如 `{"chrono-pr":"v0.1.12"}`。安装时依次采用本次环境变量、单工具标签和项目默认通道。在 mise 配置的 `[settings]` 中设置 `disable_tools = ["http:chrono-cache"]` 可停用对应工具，再次运行安装即生效。
 
 首次准备宿主使用 Git、mise 和系统命令。模板会从 origin 识别 GitHub 仓库及其默认分支，再用本次核验过的 `chrono-host-bootstrap` 执行 `prepare-template`。若用户禁用该工具，首次准备仍会从随附配方临时安装一份，校验摘要并在用完后删除。
 
