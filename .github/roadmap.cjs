@@ -45,19 +45,16 @@ module.exports = async function syncRoadmap(github, context, plan) {
       floor: plan.version, latest: latest === null ? null : latest.slice(1),
     })
   }
-  const titles = new Set(milestones.map(m => m.title))
-  if (target) titles.add(target)
   const releaseEvent = context.payload.release?.tag_name
   const selection = roadmap({
     operation: 'release-selection', releases: releasesForPlan,
-    event_tag: releaseEvent, milestones: [...titles],
+    event_tag: releaseEvent, target, milestones: milestones.map(m => m.title),
   })
-  const next = target && selection.milestones[target].final === null ? target : 'Backlog'
   const unassigned = await all(issues.listForRepo, {state: 'open', milestone: 'none'})
   const numbers = roadmap({operation: 'unassigned',
     issues: unassigned.map(({number, state, pull_request, milestone}) => ({number, state, pull_request, milestone}))})
   for (const number of numbers) {
-    const milestone = await ensure(next)
+    const milestone = await ensure(selection.destination)
     await issues.update({...repo, issue_number: number, milestone: milestone.number})
   }
   // Publishers using GITHUB_TOKEN wake this workflow via workflow_run.
