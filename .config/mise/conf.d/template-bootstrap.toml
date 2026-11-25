@@ -1,3 +1,19 @@
+[vars]
+# Read the checksum after installation, when the new selection is available.
+template_bootstrap_checksum = """
+{%- if vars.selected_chrono_host_bootstrap is defined and vars.selected_chrono_host_bootstrap -%}
+  {%- set selection = read_toml(path=vars.chrono_selection) -%}
+  {%- if os() == "linux" -%}{{ selection["chrono-host-bootstrap"][1] }}
+  {%- else -%}{{ selection["chrono-host-bootstrap"][2] }}{%- endif -%}
+{%- elif vars.chrono_pins is defined -%}
+  {%- set pins = read_toml(path=vars.chrono_pins) -%}
+  {%- set platform = os() ~ "-" ~ arch() -%}
+  {%- if "http:chrono-host-bootstrap" in pins.tools -%}
+    {{- pins.tools["http:chrono-host-bootstrap"].platforms[platform].checksum -}}
+  {%- endif -%}
+{%- endif -%}
+"""
+
 [tasks.harness-setup]
 description = "Install selected tools and prepare this checkout"
 run = ["sh .chrono-harness/install-tools.sh", "sh .chrono-harness/setup.sh {{ os() }}-{{ arch() }}"]

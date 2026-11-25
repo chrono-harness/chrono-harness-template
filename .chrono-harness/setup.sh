@@ -17,7 +17,7 @@ case "$disabled" in
         executable="$scratch/once/chrono-host-bootstrap"
         ;;
     *)
-        mise config get "$key" > "$scratch/pin"
+        mise vars template_bootstrap_checksum > "$scratch/pin"
         executable=$(mise which chrono-host-bootstrap)
         ;;
 esac
