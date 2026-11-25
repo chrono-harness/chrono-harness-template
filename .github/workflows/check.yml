@@ -16,6 +16,8 @@ jobs:
           cache: false
           install: false
       - run: mise run harness-setup
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Verify the host selected by this checkout
         env:
           HOST_BRANCH: ${{ github.event.repository.default_branch }}
