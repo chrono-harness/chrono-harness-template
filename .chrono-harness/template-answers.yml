@@ -1,4 +1,4 @@
-_commit: v0.1.33-alpha.87
+_commit: v0.1.33-alpha.97
 _src_path: gh:chrono-harness/chrono-harness-copier
 dev_branch: ''
 features:
@@ -33,5 +33,5 @@ publisher_workflow: Release
 release_plan: {}
 repository: ''
 required_check: check
-tool_install_channels: dev
-integration_tool_tags: {}
+tool_install_channels: preview
+tool_versions: {}
