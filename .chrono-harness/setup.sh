@@ -28,3 +28,6 @@ if ! printf 'sha256:%s\n' "${digest_record%% *}" | cmp -s - "$scratch/pin"; then
     exit 2
 fi
 "$executable" prepare-template
+if [ -f .chrono-harness/setup-check-retention.sh ]; then
+    sh .chrono-harness/setup-check-retention.sh
+fi
