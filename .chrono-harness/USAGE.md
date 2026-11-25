@@ -1,6 +1,6 @@
 # 使用说明
 
-在仓库根目录运行 `mise trust` 和 `mise run harness-setup`。绿色模板默认在每次安装时为所选工具查询 GitHub Releases，按公开发布时间选择最新测试版，并校验当前平台的 SHA-256。安装通道适用于任意分支与直接检出的提交。Rust 和 Verus 使用模板登记的配套版本。
+在仓库根目录运行 `mise trust` 和 `mise run harness-setup`。绿色模板默认在每次安装时为所选工具查询 GitHub Releases，按公开发布时间选择最新测试版，并校验当前平台的 SHA-256。安装通道适用于任意分支与直接检出的提交。Rust 和 Verus 使用模板登记的配套版本。安装成功后取得的版本和 Linux、macOS SHA-256 存在 `.chrono-harness/state/tool-selection/versions.toml`。检出中的 `.config/mise/conf.d/selected-chrono-harness.toml` 为 mise 提供对应的下载地址。读取 GitHub 分页失败时，安装器退出并保留上次成功的选版。
 
 ### 保存各工具的版本选择
 
