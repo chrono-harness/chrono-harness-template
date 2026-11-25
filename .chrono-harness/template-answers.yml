@@ -1,4 +1,4 @@
-_commit: v0.1.34
+_commit: v0.1.36
 _src_path: gh:chrono-harness/chrono-harness-copier
 dev_branch: ''
 features:
@@ -35,3 +35,5 @@ repository: ''
 required_check: check
 tool_install_channels: preview
 tool_versions: {}
+host_release_artifact: {"version": "0.1.0", "linux_sha256": "f5f4e6ac424e9b6477573afe4cbd2858dea554b171de5df31279aeaf15a4441c", "macos_sha256": "50138711277aeb5f1f7bbd6592a1198c63e1eb0a0d5defa442f497419f2f6dd2"}
+install_resolver_artifact: {"version": "0.1.0", "linux_sha256": "f5f4e6ac424e9b6477573afe4cbd2858dea554b171de5df31279aeaf15a4441c", "macos_sha256": "50138711277aeb5f1f7bbd6592a1198c63e1eb0a0d5defa442f497419f2f6dd2"}
