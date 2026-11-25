@@ -20,8 +20,8 @@ select_tool() {
     esac
 }
 case "$(uname -s)-$(uname -m)" in
-    Linux-x86_64) platform=linux-x64; asset=linux-x86_64; seed_sha=271e79ab48a9c7442c8edc1d404e44430711ac486893240246f754255839b785 ;;
-    Darwin-arm64) platform=macos-arm64; asset=macos-aarch64; seed_sha=7a7ac849578b7d53b98baaa7396b4273a97c9a4a9eb4998607681fb769f1a692 ;;
+    Linux-x86_64) platform=linux-x64; asset=linux-x86_64; seed_sha=f5f4e6ac424e9b6477573afe4cbd2858dea554b171de5df31279aeaf15a4441c ;;
+    Darwin-arm64) platform=macos-arm64; asset=macos-aarch64; seed_sha=50138711277aeb5f1f7bbd6592a1198c63e1eb0a0d5defa442f497419f2f6dd2 ;;
     *) fail 'Unsupported installation platform.' ;;
 esac
 verify() {
@@ -45,6 +45,12 @@ enabled() {
     case "$disabled" in *\"http:$1\"*) return 1 ;; *) return 0 ;; esac
 }
 resolved=$config_dir/zz-chrono-harness-resolved.toml
+validate_target() {
+    if [ -L "$resolved" ] || { [ -e "$resolved" ] && [ ! -f "$resolved" ]; }; then
+        fail "Expected a regular installation selection: $resolved"
+    fi
+}
+validate_target
 export MISE_IGNORED_CONFIG_PATHS="${MISE_IGNORED_CONFIG_PATHS:+$MISE_IGNORED_CONFIG_PATHS:}$resolved"
 export MISE_TRUSTED_CONFIG_PATHS="$work${MISE_TRUSTED_CONFIG_PATHS:+:$MISE_TRUSTED_CONFIG_PATHS}"
 while read -r command repository; do
@@ -57,7 +63,7 @@ while read -r command repository; do
         downloads=$(mktemp -d "$temp_parent/chrono-install.XXXXXXXX")
         seed=$downloads/chrono-host-release
         curl --disable --proto '=https' --proto-redir '=https' --fail --silent --show-error --location \
-            "https://github.com/chrono-harness/chrono-harness-host-release/releases/download/v0.1.0-alpha.29/chrono-host-release-$asset" -o "$seed"
+            "https://github.com/chrono-harness/chrono-harness-host-release/releases/download/v0.1.0/chrono-host-release-$asset" -o "$seed"
         verify "$seed" "$seed_sha"
         chmod 700 "$seed"
     fi
@@ -112,8 +118,18 @@ chrono-test-git chrono-harness/chrono-harness-test-git
 chrono-test-git-profile chrono-harness/chrono-harness-test-git
 chrono-worktree chrono-harness/chrono-harness-worktree
 TOOLS
-# The nested config takes precedence over any previous checkout receipt.
-# mise installs explicit versions and verifies fresh downloads. Also hash cache hits.
+# An explicit mise argument installs the requested release even when a matching prerelease is cached.
+set --
+for command in chrono-cache chrono-ci chrono-diagnostics chrono-distribution chrono-harness chrono-host-bootstrap chrono-host-release chrono-inputs chrono-instructions chrono-judge-ci chrono-judge-cost chrono-judge-filemap chrono-judge-mixed chrono-judge-projects chrono-judge-registration chrono-judge-routes chrono-judge-workflow chrono-pr chrono-test-git chrono-test-git-profile chrono-worktree; do
+    enabled "$command" || continue
+    select_tool "$command"
+    source=$manifest
+    if [ "$selector" = pinned ]; then source=$config_dir/chrono-harness.toml; fi
+    version=$(mise config get --file "$source" "tools.\"http:$command\".version")
+    set -- "$@" "http:$command@$version"
+done
+if [ "$#" -gt 0 ]; then mise -C "$work" install "$@"; fi
+# Install remaining host tools, including Rust and Verus where selected.
 mise -C "$work" install
 for command in chrono-cache chrono-ci chrono-diagnostics chrono-distribution chrono-harness chrono-host-bootstrap chrono-host-release chrono-inputs chrono-instructions chrono-judge-ci chrono-judge-cost chrono-judge-filemap chrono-judge-mixed chrono-judge-projects chrono-judge-registration chrono-judge-routes chrono-judge-workflow chrono-pr chrono-test-git chrono-test-git-profile chrono-worktree; do
     enabled "$command" || continue
@@ -124,6 +140,7 @@ for command in chrono-cache chrono-ci chrono-diagnostics chrono-distribution chr
     executable=$(mise -C "$work" which "$command")
     verify "$executable" "${expected#sha256:}"
 done
+validate_target
 if [ -s "$manifest" ]; then
     mv -f "$manifest" "$resolved"
 else
