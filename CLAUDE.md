@@ -54,7 +54,9 @@ mise run harness-setup
 
 先审查已有能力，再扩展。采用成熟、经过验证的软件工程方法，按 KISS、YAGNI、DRY 在现有负责位置简化、按需开发和复用。对照需求、当前 SPEC、实际使用方、已有能力和保留证据，核对职责归属、已登记依赖的影响，以及验证、CI 和存储成本。
 
-依次查本仓、固定版本的直接依赖和允许使用的外部来源，包括私有定义和仍有效的失败结论；核对接口、假设和适用范围。已有能力够用就复用。审查和测试限于实际风险与明确依赖；看不见不等于没有，考虑全局也不意味着每次都审查或测试全仓。
+依次查本仓、固定版本的直接依赖和允许使用的外部来源，包括私有定义和仍有效的失败结论；核对接口、假设和适用范围。审查和测试限于实际风险与明确依赖；看不见不等于没有，考虑全局也不意味着每次都审查或测试全仓。
+
+提出新工具、脚本、定时任务或验收项之前，先问“维持现状，谁的哪项明确需求会落空？”按实际配置核对平台已有行为。说不出具体缺口就停止这项提议，已开始的重复工作也应撤回。系统已自动滚动、过期或淘汰产物时，交由系统处理，无需额外轮换缓存键、安排清理或逐项追踪删除。只有明确需求超出现有能力，或实际故障影响使用方时，才处理具体缺口。
 
 ## registry.explicit
 
@@ -141,16 +143,22 @@ mise run harness-setup
 在 GitHub 的 Issue、PR、评论和评审中记录实际动作或结果。先写给人看的正文，空一行，再在末尾追加以下三行。GitHub 页面显示中间的摘要，API 原文保留两个 HTML 注释及其中的关联 ID。事件也可单独成文。每行从第 1 列开始，字段顺序与空格固定，首尾使用同一个随机 event。
 
 ~~~text
-<!-- chrono-agent:v3 event=<event> session=<session> parent=<parent> task=<task> -->
-**Agent** `<agent>` · **action** `<action>` · **state** `<state>` · **target** `<target>`
-<!-- /chrono-agent:v3 event=<event> -->
+<!-- chrono-agent:v4 event=<event> parent=<parent> task=<task> -->
+**Agent** `<agent>` · **session** `<session>` · **model** `<model>` · **action** `<action>` · **state** `<state>` · **target** `<target>`
+<!-- /chrono-agent:v4 event=<event> -->
 ~~~
 
-agent 写实际运行时和任务路径，至少两段，每段符合 [a-z0-9][a-z0-9_-]*。session 是会话首次建立时随机生成的公开小写 UUIDv4，同会话的重试复用；fork 新建 session 并接收直接父会话的公开 UUID，根写 parent=-。task 是同一实际任务沿用的公开随机 UUIDv4，父子共同工作时传递它。另行委派的独立任务新建 task，其委派事件可用 target=task/<新任务 UUID>。event 每个新动作或状态变化生成独立的公开随机 UUIDv4；传输重送复用原事件和相同字段。UUID 必须为小写标准形式、版本 4、变体 8/9/a/b。session、parent、task 和 event 的 UUID 两两不同。只使用这些公开专用 ID。
+agent 写实际运行时和任务路径，至少两段，每段符合 [a-z0-9][a-z0-9_-]*。session 是会话首次建立时随机生成的公开小写 UUIDv4，同会话的重试复用；fork 新建 session 并接收直接父会话的公开 UUID，根写 parent=-。task 是同一实际任务沿用的公开随机 UUIDv4，父子共同工作时传递它。一个 task 可包含多个 session 和模型，同一 session 也可在事件之间切换模型。在可见摘要中写完整的公开专用 session UUID 和本次事件实际使用的模型 ID 或别名。model 符合 [A-Za-z0-9][A-Za-z0-9._/@:+-]*；运行时未提供实际型号时写 unknown。另行委派的独立任务新建 task，其委派事件可用 target=task/<新任务 UUID>。event 每个新动作或状态变化生成独立的公开随机 UUIDv4；传输重送复用原事件和相同字段。UUID 必须为小写标准形式、版本 4、变体 8/9/a/b。session、parent、task 和 event 的 UUID 两两不同。只使用这些公开专用 ID。
 
 action 取 task、delegate、issue、pr、review、push、ci.wait、check、build、test、release 之一。state 取 started、waiting、progress、blocked、succeeded、failed、cancelled 之一。target 取 self（本条正文所在的 GitHub 对象，适合编号未分配时）、task/<UUIDv4>、owner/repo#正整数、owner/repo@完整小写 Git OID（40 或 64 位）、owner/repo/run/正整数（可接 /attempt/正整数）或 owner/repo/tag/ASCII标签。开始、等待、解除阻塞、进展和结束时记录真实发生的转换，沿用同一 task、以不同 event 区分。等待完成通知时只发一次 waiting。成功/失败/取消结束该动作；新试验用新的事件陈述重试。保留乱序到达的每条观察，按 GitHub 原对象及创建时间组织，不以最后到达推断状态。相同 event 及内容只计一次，相同 event 内容冲突记为未知。
 
-用 chrono-instructions event-format 将八字段 JSON 写成 v3。event-read 从原始 GitHub 正文读取八字段 JSON，也能读取已发布的 v2。event-regex 输出 Python、PCRE2 和 JavaScript 可直接使用的三行正则，捕获组 1 到 8 依次为 event、session、parent、task、agent、action、state、target，末行反向引用第 1 组。读取器核对顶层 Markdown、唯一的末尾记录、UUID 独立性及首尾一致，接受 LF 或 CRLF 和一个可选末尾换行。引用、围栏及 HTML 示例中的内容按 Markdown 处理。缺失、无效、截断和歧义均记为未知。GitHub 提供作者账号，事件记录自报信息。复制整个记录能通过语法校验，身份和执行结果须分别核实。
+用 chrono-instructions event-format 将九字段 JSON 写成 v4，省略 model 时写 unknown。event-read 从 GitHub 原始正文读取九字段 JSON，也能读取已发布的 v3 和 v2，并为旧记录返回 model=unknown。event-regex 输出 Python、PCRE2 和 JavaScript 可直接使用的三行正则，捕获组 1 到 9 依次为 event、parent、task、agent、session、model、action、state、target，末行反向引用第 1 组。读取器核对顶层 Markdown、唯一的末尾记录、UUID 独立性及首尾一致，接受 LF 或 CRLF 和一个可选末尾换行。引用、围栏及 HTML 示例中的内容按 Markdown 处理。缺失、无效、截断和歧义均记为未知。GitHub 提供作者账号，事件记录自报信息。复制整个记录能通过语法校验，身份和执行结果须分别核实。
+
+## collaboration.github-contribution
+
+普通 Issue 按主要诉求选择一个主标签：缺陷用 `bug`，功能或改进用 `enhancement`，文档用 `documentation`，问题用 `question`。发布失败沿用专用 `release-failure`。分支从 `dev` 创建，选 `feature/` 或 `integration/`，后接英文小写连字符短语；有本仓 Issue 时在短语前加编号和连字符。日常 PR 以 `dev` 为目标，正式版使用 `main`。PR 标题采用 `type(scope): 结果`，正文用 `Refs #编号` 关联工作，合入默认分支即可满足全部验收时用 `Closes #编号`；仍需发布、落地 CI 或下游采用时用 `Refs`，取得证据后关闭。跨仓引用写完整仓库名和编号。
+
+[组织协作规范](https://github.com/chrono-harness/chrono-harness-main/blob/dev/docs/contributing.md)
 
 ## candidate.landing
 
