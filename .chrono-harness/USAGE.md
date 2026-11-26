@@ -37,3 +37,15 @@ uvx --from copier==9.19.1 copier update --defaults --vcs-ref :current: --answers
 ```
 
 若最后一次成功的本地完整检查报告也应到期，在同一条命令加上 `-d 'expire_local_check_slots=[".chrono-harness/state/collection/check.json"]'`，将示例路径换成本仓登记的实际报告路径。默认列表为空。需要长期使用的结果应在窗口内转入持久存储。
+
+## 依赖更新
+
+从绿色按钮新建的仓库每天检查 GitHub Actions，并将更新目标设为仓库当前的默认分支。在 GitHub 仓库设置中开启 **Allow auto-merge**，并为该分支指定实际 PR 状态检查为必需，Dependabot PR 便会在检查通过后自动合并。
+
+在新仓运行首次 `mise run harness-setup`，提交生成的仓库和分支设置，再调整依赖更新。Copier 的 `dependabot_updates` 接受原生 v2 更新列表。每项使用 `package-ecosystem`、`directory` 或 `directories` 和 `schedule`；例如将现有 `schedule.interval` 从 `daily` 改为 `weekly`。将你要采用的完整列表写入一个 YAML 数据文件，顶层字段为 `dependabot_updates`，然后运行：
+
+```sh
+uvx --from copier==9.19.1 copier update --defaults --vcs-ref :current: --answers-file .chrono-harness/template-answers.yml --data-file updates.yml
+```
+
+要保留依赖更新 PR 并手动合并，在数据文件中设置 `dependabot_auto_merge: false`。要停用定期版本更新，设置 `dependabot_updates: []`。检查并提交生成的 `.github/dependabot.yml`、`.github/workflows/dependabot-auto-merge.yml` 和模板答案的变更。GitHub 的安全更新可在仓库设置中单独管理。
