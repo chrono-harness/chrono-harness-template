@@ -37,3 +37,6 @@ tool_install_channels: preview
 tool_versions: {}
 host_release_artifact: {"version": "0.1.4", "linux_sha256": "e955b761c6d1819c3710faef74746ecac84d9ee5e9a051c09a67aafe82cde595", "macos_sha256": "01b08b48bf432e21c8f53be131f9320b008a125344bc8b56a4b30a3fd9c3ae0b"}
 install_resolver_artifact: {"version": "0.1.4", "linux_sha256": "e955b761c6d1819c3710faef74746ecac84d9ee5e9a051c09a67aafe82cde595", "macos_sha256": "01b08b48bf432e21c8f53be131f9320b008a125344bc8b56a4b30a3fd9c3ae0b"}
+dependabot_auto_merge: true
+dependabot_updates:
+- {"package-ecosystem": "github-actions", "directory": "/", "schedule": {"interval": "daily"}, "groups": {"github-actions": {"patterns": ["*"]}}}
